@@ -10,6 +10,9 @@ export default function Hero() {
 
         {/* Left Side */}
     <div className="md:w-[55%]">
+      <p className="uppercase tracking-[4px] text-yellow-300 font-semibold mb-4">
+  Your Trusted Digital Partner
+</p>
      <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
  Welcome to
 <br />
@@ -18,18 +21,23 @@ export default function Hero() {
 </span>
 </h1>
          <p className="mt-6 text-lg md:text-xl text-blue-100 leading-8 max-w-xl">
-  We help businesses grow online with professional Website Development,
-  SEO, Digital Marketing and Branding solutions.
+ We build fast, modern and responsive websites that help businesses establish a strong online presence. From website development to SEO and digital marketing, we focus on delivering quality solutions with dedicated support.
 </p>
 
           <div className="mt-8 flex gap-4">
-            <button className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
-              Get Started
-            </button>
+           <a
+  href="#contact"
+  className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+>
+  Get Started
+</a>
 
-            <button className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition">
-              Our Services
-            </button>
+            <a
+  href="#services"
+  className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+>
+  Our Services
+</a>
           </div>
         </div>
 
@@ -40,7 +48,7 @@ export default function Hero() {
   alt="Hero Image"
   width={550}
   height={420}
-  className="rounded-3xl shadow-2xl hover:scale-105 transition-all duration-500"
+ className="rounded-3xl shadow-2xl hover:scale-105 hover:-translate-y-2 transition-all duration-500"
 />
         </div>
 
