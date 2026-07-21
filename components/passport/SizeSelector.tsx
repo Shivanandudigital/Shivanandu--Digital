@@ -1,37 +1,38 @@
 "use client";
 
+import { passportSizes } from "@/lib/passportSizes";
+
 type Props = {
   value: string;
   onChange: (value: string) => void;
 };
-
-const sizes = [
-  { label: "India Passport (35×45 mm)", value: "35x45" },
-  { label: "US Visa (2×2 inch)", value: "2x2" },
-  { label: "Custom", value: "custom" },
-];
 
 export default function SizeSelector({
   value,
   onChange,
 }: Props) {
   return (
-    <div className="mb-6">
-      <label className="block font-semibold mb-2">
-        Passport Size
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+
+      <label className="mb-3 block text-lg font-semibold">
+        Passport / Visa Size
       </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3"
+        className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-blue-500"
       >
-        {sizes.map((size) => (
-          <option key={size.value} value={size.value}>
-            {size.label}
+        {passportSizes.map((size) => (
+          <option
+            key={size.id}
+            value={size.id}
+          >
+            {size.name}
           </option>
         ))}
       </select>
+
     </div>
   );
 }
