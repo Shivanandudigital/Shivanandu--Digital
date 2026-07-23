@@ -17,10 +17,10 @@ export default function BackgroundSelector({
   onChange,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-4 text-lg font-bold">
-        Background Color
-      </h3>
+<div>
+      <h3 className="mb-2 text-base font-semibold">
+  Background Color
+</h3>
 
       <div className="flex flex-wrap gap-3">
         {colors.map((color) => (
@@ -39,4 +39,4 @@ export default function BackgroundSelector({
       </div>
     </div>
   );
-}
+} 

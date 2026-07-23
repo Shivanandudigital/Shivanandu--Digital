@@ -10,11 +10,11 @@ export default function BackgroundRemover({
   loading,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div>
 
-      <h3 className="mb-4 text-lg font-bold">
-        AI Background Removal
-      </h3>
+      <h3 className="mb-2 text-base font-semibold">
+  AI Background Removal
+</h3>
 
       <button
         onClick={onRemove}

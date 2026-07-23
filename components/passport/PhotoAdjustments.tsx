@@ -18,10 +18,8 @@ export default function PhotoAdjustments({
   onSaturationChange,
 }: Props) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-md space-y-5">
-      <h3 className="text-xl font-bold">
-        Photo Adjustments
-      </h3>
+<div className="space-y-5">
+     
 
       <div>
         <label className="font-medium">
@@ -36,7 +34,7 @@ export default function PhotoAdjustments({
           onChange={(e) =>
             onBrightnessChange(Number(e.target.value))
           }
-          className="w-full"
+         className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
         />
       </div>
 
@@ -53,7 +51,7 @@ export default function PhotoAdjustments({
           onChange={(e) =>
             onContrastChange(Number(e.target.value))
           }
-          className="w-full"
+     className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
         />
       </div>
 
@@ -70,7 +68,7 @@ export default function PhotoAdjustments({
           onChange={(e) =>
             onSaturationChange(Number(e.target.value))
           }
-          className="w-full"
+         className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
         />
       </div>
     </div>

@@ -12,9 +12,9 @@ export default function SizeSelector({
   onChange,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+<div>
 
-      <label className="mb-3 block text-lg font-semibold">
+      <label className="mb-2 block text-base font-semibold">
         Passport / Visa Size
       </label>
 

@@ -14,8 +14,7 @@ export default function CropControls({
   onRotationChange,
 }: Props) {
   return (
-    <div className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
+   <div className="space-y-6">
       <div>
         <div className="mb-2 flex justify-between">
           <span className="font-semibold">
@@ -36,7 +35,7 @@ export default function CropControls({
           onChange={(e) =>
             onZoomChange(Number(e.target.value))
           }
-          className="w-full"
+    className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
         />
       </div>
 
@@ -59,7 +58,7 @@ export default function CropControls({
           onChange={(e) =>
             onRotationChange(Number(e.target.value))
           }
-          className="w-full"
+          className="mt-2 h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-blue-600"
         />
       </div>
 
