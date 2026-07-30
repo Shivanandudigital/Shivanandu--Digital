@@ -17,7 +17,7 @@ export default function BackgroundSelector({
   onChange,
 }: Props) {
   return (
-<div>
+<div className="min-w-0">
       <h3 className="mb-2 text-base font-semibold">
   Background Color
 </h3>
@@ -34,6 +34,7 @@ export default function BackgroundSelector({
             }`}
             style={{ backgroundColor: color.value }}
             title={color.name}
+            aria-label={`Use ${color.name} background`}
           />
         ))}
       </div>

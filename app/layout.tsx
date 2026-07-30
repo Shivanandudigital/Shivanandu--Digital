@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,10 +12,67 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Shivanandu Digital | Website Development & Digital Marketing",
+export const metadata: Metadata = {
+  metadataBase: new URL("https://shivanandudigital.com"),
+  title: {
+    default: "Shivanandu Digital | Professional Digital Tools & Services",
+    template: "%s | Shivanandu Digital",
+  },
   description:
-    "Professional Website Development, SEO, Digital Marketing and Branding Services.",
+    "Create passport photos, process PDFs, enhance images and access professional digital services with Shivanandu Digital.",
+  applicationName: "Shivanandu Digital",
+  authors: [{ name: "Shivanandu Digital" }],
+  creator: "Shivanandu Digital",
+  publisher: "Shivanandu Digital",
+  category: "Digital Services",
+  keywords: [
+    "Shivanandu Digital",
+    "passport photo maker",
+    "passport size photo",
+    "background remover",
+    "photo enhancer",
+    "JPG to PDF",
+    "PDF to JPG",
+    "PDF compressor",
+    "online digital tools",
+    "digital services India",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    locale: "en_IN",
+    siteName: "Shivanandu Digital",
+    title: "Shivanandu Digital | Professional Digital Tools & Services",
+    description:
+      "Professional online photo and document tools from Shivanandu Digital.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shivanandu Digital | Professional Digital Tools & Services",
+    description:
+      "Professional online photo and document tools from Shivanandu Digital.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#1d4ed8",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -25,10 +82,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

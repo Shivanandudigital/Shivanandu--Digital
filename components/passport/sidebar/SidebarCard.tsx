@@ -12,7 +12,7 @@ export default function SidebarCard({
   children,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md sm:p-6">
       <div className="mb-5 border-b border-gray-100 pb-3">
   <h3 className="text-lg font-bold text-gray-800">
     {title}

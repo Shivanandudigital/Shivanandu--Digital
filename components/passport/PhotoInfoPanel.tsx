@@ -16,7 +16,7 @@ export default function PhotoInfoPanel({
   sizeName,
 }: Props) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="h-full min-w-0 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
 
       <h3 className="mb-4 text-lg font-bold">
         Photo Information
@@ -24,37 +24,37 @@ export default function PhotoInfoPanel({
 
       <div className="space-y-3 text-sm">
 
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-4">
           <span>Face</span>
-          <span>
+          <span className="text-right">
             {faceDetected ? "✅ Detected" : "❌ Not Found"}
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-4">
           <span>Center</span>
-          <span>
+          <span className="text-right">
             {centered ? "✅ Perfect" : "⚠️ Adjust"}
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-4">
           <span>Head Size</span>
-          <span>
+          <span className="text-right">
             {headSize}%
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-4">
           <span>Status</span>
-          <span>
+          <span className="text-right capitalize">
             {headStatus}
           </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-start justify-between gap-4">
           <span>Template</span>
-          <span>{sizeName}</span>
+          <span className="min-w-0 text-right leading-5">{sizeName}</span>
         </div>
 
       </div>

@@ -15,7 +15,7 @@ export default function QualityScore({
       : "text-red-500";
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
 
       <h3 className="mb-4 text-lg font-bold">
         AI Quality Score

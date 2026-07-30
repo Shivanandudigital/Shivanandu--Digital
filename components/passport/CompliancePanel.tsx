@@ -4,6 +4,7 @@ type Props = {
   faceDetected: boolean;
   centered: boolean;
   backgroundOk: boolean;
+  eyeLineOk: boolean;
   headSize: number;
   headStatus: "perfect" | "small" | "large" | "unknown";
 };
@@ -12,6 +13,7 @@ export default function CompliancePanel({
   faceDetected,
   centered,
   backgroundOk,
+  eyeLineOk,
   headSize,
   headStatus,
 }: Props) {
@@ -19,16 +21,18 @@ export default function CompliancePanel({
     faceDetected &&
     centered &&
     backgroundOk &&
+    eyeLineOk &&
     headStatus === "perfect";
 
-  const score =
-    (faceDetected ? 25 : 0) +
-    (centered ? 25 : 0) +
-    (backgroundOk ? 25 : 0) +
-    (headStatus === "perfect" ? 25 : 0);
+ const score =
+  (faceDetected ? 20 : 0) +
+  (centered ? 20 : 0) +
+  (backgroundOk ? 20 : 0) +
+  (eyeLineOk ? 20 : 0) +
+  (headStatus === "perfect" ? 20 : 0);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
       <div className="mb-5 border-b border-gray-100 pb-3">
         <h3 className="text-lg font-bold text-gray-800">
@@ -59,7 +63,7 @@ export default function CompliancePanel({
         </div>
       </div>
 
-      <div className="space-y-2 text-sm">
+      <div className="grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-1">
 
         <p>{faceDetected ? "✅" : "❌"} Face Detected</p>
 
@@ -67,6 +71,7 @@ export default function CompliancePanel({
 
         <p>{backgroundOk ? "✅" : "❌"} Background OK</p>
 
+<p>{eyeLineOk ? "✅" : "❌"} Eye Line OK</p>
         <p>
           {headStatus === "perfect"
             ? "✅"
@@ -79,7 +84,7 @@ export default function CompliancePanel({
       </div>
 
       <div
-        className={`mt-6 rounded-lg p-3 text-center font-semibold ${
+        className={`mt-6 rounded-lg p-3 text-center text-sm font-semibold sm:text-base ${
           passed
             ? "bg-green-100 text-green-700"
             : "bg-red-100 text-red-700"
