@@ -12,29 +12,29 @@ export default function Services() {
 
   return (
     <section
-      id="services"
-      className="scroll-mt-24 bg-gray-100 py-20"
+      id="tools"
+      className="scroll-mt-24 bg-gray-100 py-14 sm:py-20"
     >
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
-        <h2 className="text-4xl font-bold text-center">
+        <h2 className="text-center text-3xl font-bold sm:text-4xl">
           Our Services & Tools
         </h2>
 
-        <p className="text-center text-gray-600 mt-3 mb-10">
+        <p className="mb-8 mt-3 text-center text-sm text-gray-600 sm:mb-10 sm:text-base">
           Professional Digital Services & Powerful Online Tools
         </p>
 
         <SearchBar />
 
         {categories.map((category) => (
-          <div key={category} className="mb-16">
+          <div key={category} className="mb-12 sm:mb-16">
 
-            <h3 className="text-2xl font-bold mb-6">
+            <h3 className="mb-5 text-xl font-bold sm:mb-6 sm:text-2xl">
               {category}
             </h3>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6">
 
               {tools
                 .filter((tool) => tool.category === category)

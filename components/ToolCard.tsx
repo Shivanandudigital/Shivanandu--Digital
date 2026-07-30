@@ -14,9 +14,9 @@ export default function ToolCard({
   href,
 }: ToolCardProps) {
   return (
-    <Link href={href}>
-      <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full">
-        <div className="text-5xl mb-4">{icon}</div>
+    <Link href={href} className="block h-full">
+      <div className="h-full cursor-pointer rounded-2xl border border-gray-200 bg-white p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-6">
+        <div className="mb-4 text-4xl sm:text-5xl">{icon}</div>
 
         <h3 className="text-xl font-bold text-gray-900 mb-2">
           {title}

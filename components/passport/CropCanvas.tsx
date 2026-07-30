@@ -9,7 +9,6 @@ type Props = {
   rotation: number;
   aspect: number;
   headStatus: "perfect" | "small" | "large" | "unknown";
-headSize: number;
 faceDetected: boolean;
 
   onCropChange: (crop: Point) => void;
@@ -27,7 +26,6 @@ export default function CropCanvas({
   rotation,
   aspect,
   headStatus,
-  headSize,
   faceDetected,
   onCropChange,
   onZoomChange,
@@ -35,11 +33,11 @@ export default function CropCanvas({
 }: Props) {
 
   return (
-    <div className="relative h-[500px] w-full overflow-hidden rounded-2xl bg-gray-900">
-<div className="absolute right-4 top-4 z-20 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+    <div className="relative h-[360px] w-full overflow-hidden rounded-xl bg-gray-900 sm:h-[440px] sm:rounded-2xl lg:h-[500px]">
+<div className="absolute right-2 top-2 z-20 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white sm:right-4 sm:top-4 sm:px-3 sm:text-xs">
   🔍 {zoom.toFixed(1)}x
 </div>
-<div className="absolute right-4 top-14 z-20 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+<div className="absolute right-2 top-11 z-20 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-semibold text-white sm:right-4 sm:top-14 sm:px-3 sm:text-xs">
   🔄 {rotation}°
 </div>
 
@@ -101,8 +99,8 @@ export default function CropCanvas({
 
 </div> 
 
-<div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2">
-  <p className="rounded-full bg-black/60 px-4 py-2 text-xs font-medium text-white">
+<div className="absolute bottom-4 left-1/2 z-20 w-[92%] -translate-x-1/2 sm:bottom-6 sm:w-auto">
+  <p className="rounded-2xl bg-black/60 px-3 py-2 text-center text-[11px] font-medium text-white sm:rounded-full sm:px-4 sm:text-xs">
     {!faceDetected
       ? "📷 Looking for a face..."
       : headStatus === "perfect"

@@ -8,20 +8,20 @@ export default function EditorHeader({
   onChoosePhoto,
 }: Props) {
   return (
-    <div className="mb-6 flex items-center justify-between rounded-2xl border bg-white p-6 shadow-sm">
+    <div className="mb-6 flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm sm:p-6 md:flex-row md:items-center md:justify-between">
       <div>
-        <h2 className="text-3xl font-bold">
+        <h2 className="text-2xl font-bold leading-tight sm:text-3xl">
           Passport Photo Maker
         </h2>
 
-        <p className="text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 sm:text-base">
           Professional Passport & Visa Photo Editor
         </p>
       </div>
 
       <button
         onClick={onChoosePhoto}
-        className="rounded-xl bg-red-600 px-5 py-3 text-white font-semibold hover:bg-red-700"
+        className="w-full rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700 md:w-auto"
       >
         Choose Another Photo
       </button>

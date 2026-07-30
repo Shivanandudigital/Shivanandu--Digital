@@ -16,13 +16,13 @@ export default function Home() {
 {/* Portfolio */}
 <section
   id="portfolio"
-  className="scroll-mt-24 py-20 px-6 max-w-6xl mx-auto"
+  className="mx-auto max-w-6xl scroll-mt-24 px-4 py-14 sm:px-6 sm:py-20"
 >
-  <h2 className="text-4xl font-bold text-center mb-12">
+  <h2 className="mb-8 text-center text-3xl font-bold sm:mb-12 sm:text-4xl">
     Our Portfolio
   </h2>
 
-  <div className="grid md:grid-cols-3 gap-8">
+  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
 
     {/* Project 1 */}
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -90,18 +90,18 @@ export default function Home() {
   </div>
 </section>
 {/* Testimonials */}
-<section className="bg-gray-100 py-20 px-6">
+<section className="bg-gray-100 px-4 py-14 sm:px-6 sm:py-20">
   <div className="max-w-6xl mx-auto">
-    <h2 className="text-4xl font-bold text-center mb-12">
+    <h2 className="mb-8 text-center text-3xl font-bold sm:mb-12 sm:text-4xl">
       What Our Clients Say
     </h2>
 
-    <div className="grid md:grid-cols-3 gap-8">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
 
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <p className="text-gray-600 mb-4">
-          "Shivanandu Digital created an amazing website for our business.
-          Professional service and excellent support."
+          &ldquo;Shivanandu Digital created an amazing website for our business.
+          Professional service and excellent support.&rdquo;
         </p>
         <h3 className="font-bold text-lg">
           Rajesh Sharma
@@ -113,8 +113,8 @@ export default function Home() {
 
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <p className="text-gray-600 mb-4">
-          "Our Google rankings improved significantly after their SEO work.
-          Highly recommended."
+          &ldquo;Our Google rankings improved significantly after their SEO work.
+          Highly recommended.&rdquo;
         </p>
         <h3 className="font-bold text-lg">
           Priya Das
@@ -126,8 +126,8 @@ export default function Home() {
 
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <p className="text-gray-600 mb-4">
-          "Great communication, fast delivery and quality digital marketing
-          services."
+          &ldquo;Great communication, fast delivery and quality digital marketing
+          services.&rdquo;
         </p>
         <h3 className="font-bold text-lg">
           Amit Roy
@@ -146,20 +146,23 @@ export default function Home() {
   href="https://wa.me/919064637690"
   target="_blank"
   rel="noopener noreferrer"
-  className="fixed bottom-6 right-6 z-50 hover:scale-110 transition-all duration-300"
+  className="fixed bottom-4 right-4 z-50 transition-all duration-300 hover:scale-110 sm:bottom-6 sm:right-6"
 >
-  <img
+  <Image
     src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
     alt="WhatsApp"
-    className="w-14 h-14 drop-shadow-2xl"
+    width={56}
+    height={56}
+    unoptimized
+    className="h-12 w-12 drop-shadow-2xl sm:h-14 sm:w-14"
   />
 </a>
 {/* Contact */}
 <section
   id="contact"
-  className="scroll-mt-24 py-20 px-6 max-w-4xl mx-auto text-center"
+  className="mx-auto max-w-4xl scroll-mt-24 px-4 py-14 text-center sm:px-6 sm:py-20"
 >
-  <h2 className="text-4xl font-bold mb-6">
+  <h2 className="mb-6 text-3xl font-bold sm:text-4xl">
     Contact Us
   </h2>
 
@@ -167,7 +170,7 @@ export default function Home() {
     Ready to grow your business online? Get in touch with us today.
   </p>
 
-  <div className="space-y-4 text-lg">
+  <div className="space-y-4 break-words text-base sm:text-lg">
     <p>📧 shivanandudigital2020@gmail.com</p>
     <p>📱 +91 9883270045</p>
     <p>💬 WhatsApp: +91 9064637690</p>
@@ -190,7 +193,7 @@ export default function Home() {
   </div>
 
   {/* Contact Form */}
-  <form className="mt-10 max-w-2xl mx-auto space-y-5 bg-white p-8 rounded-2xl shadow-xl">
+  <form className="mx-auto mt-10 max-w-2xl space-y-5 rounded-2xl bg-white p-4 shadow-xl sm:p-8">
     <input
       type="text"
       placeholder="Your Name"
@@ -217,18 +220,18 @@ export default function Home() {
 
     <button
       type="submit"
-      className="bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-800"
+      className="w-full rounded-lg bg-blue-700 px-8 py-3 font-semibold text-white transition hover:bg-blue-800 sm:w-auto"
     >
       Send Message
     </button>
   </form>
 
   {/* Google Map */}
-  <div className="mt-10 rounded-xl overflow-hidden shadow-lg">
+  <div className="mt-10 overflow-hidden rounded-xl shadow-lg">
 <iframe
   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3646.3510621715127!2d88.1563610241147!3d23.948023040692213!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f98343ad42adf7%3A0xdd20426d2c6b2d74!2sShivanandu%20digital%20center%20(CSC)!5e0!3m2!1sen!2sin!4v1784264784522!5m2!1sen!2sin"
   width="100%"
-  height="400"
+  height="360"
   style={{ border: 0 }}
   allowFullScreen
   loading="lazy"

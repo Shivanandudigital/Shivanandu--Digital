@@ -4,9 +4,9 @@ export default function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-24 py-20 px-6 max-w-7xl mx-auto"
+      className="mx-auto max-w-7xl scroll-mt-24 px-4 py-14 sm:px-6 sm:py-20"
     >
-      <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="grid items-center gap-8 md:grid-cols-2 lg:gap-12">
 
         <div>
           <Image
@@ -14,16 +14,16 @@ export default function About() {
             alt="About Shivanandu Digital"
             width={600}
             height={400}
-            className="rounded-3xl shadow-xl w-full h-auto"
+            className="h-auto w-full rounded-2xl shadow-xl sm:rounded-3xl"
           />
         </div>
 
         <div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:mb-6 sm:text-4xl">
             About Us
           </h2>
 
-          <p className="text-gray-600 text-lg leading-8">
+          <p className="text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
             Shivanandu Digital provides professional website development,
             digital marketing, SEO, social media management and branding
             solutions for businesses.
