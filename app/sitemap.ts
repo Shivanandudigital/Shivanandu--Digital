@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://shivanandudigital.com";
+const siteUrl = "https://www.shivanandudigital.com";
 
 const toolSlugs = [
   "passport-photo-maker",
@@ -18,10 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+
     ...toolSlugs.map((slug) => ({
       url: `${siteUrl}/tools/${slug}`,
       changeFrequency: "monthly" as const,
-      priority: slug === "passport-photo-maker" ? 0.9 : 0.8,
+      priority:
+        slug === "passport-photo-maker" ? 0.9 : 0.8,
     })),
   ];
 }
