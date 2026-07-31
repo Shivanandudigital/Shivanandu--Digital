@@ -12,49 +12,103 @@ type Props = {
   }>;
 };
 
-const toolMetadata: Record<
-  string,
-  { title: string; description: string }
-> = {
+type ToolMetadata = {
+  title: string;
+  seoTitle: string;
+  description: string;
+  keywords: string[];
+};
+
+const toolMetadata: Record<string, ToolMetadata> = {
   "passport-photo-maker": {
     title: "Passport Photo Maker",
+    seoTitle: "Passport Photo Maker Online",
     description:
-      "Create professional passport and visa photos with AI background removal, ICAO composition checks and JPG, PNG, PDF or print-sheet downloads.",
+      "Create professional passport and visa photos online in 35×45 mm, 2×2 inch and other standard sizes with AI background removal, ICAO checks and print-ready downloads.",
+    keywords: [
+      "passport photo maker",
+      "passport photo maker online",
+      "35x45 passport photo",
+      "2x2 passport photo",
+      "Indian passport photo maker",
+      "visa photo maker",
+      "passport size photo online",
+      "AI passport photo",
+      "ICAO passport photo",
+      "passport photo print sheet",
+    ],
   },
+
   "photo-enhancer": {
     title: "Photo Enhancer",
+    seoTitle: "Online Photo Enhancer",
     description:
-      "Improve photo quality online with the Shivanandu Digital Photo Enhancer.",
+      "Improve image clarity and photo quality online with the Shivanandu Digital Photo Enhancer.",
+    keywords: [
+      "photo enhancer",
+      "online photo enhancer",
+      "improve photo quality",
+      "image enhancer",
+    ],
   },
+
   "background-remover": {
     title: "Background Remover",
+    seoTitle: "Background Remover Online",
     description:
-      "Remove image backgrounds online and create clean professional photos.",
+      "Remove image backgrounds online and create clean, professional photos with Shivanandu Digital.",
+    keywords: [
+      "background remover",
+      "remove image background",
+      "transparent background",
+      "online background remover",
+    ],
   },
+
   "jpg-to-pdf": {
     title: "JPG to PDF",
+    seoTitle: "JPG to PDF Converter Online",
     description:
-      "Convert JPG images into a convenient PDF document online.",
+      "Convert JPG images into a convenient, high-quality PDF document online.",
+    keywords: [
+      "JPG to PDF",
+      "image to PDF",
+      "online PDF converter",
+      "convert JPG to PDF",
+    ],
   },
+
   "pdf-to-jpg": {
     title: "PDF to JPG",
+    seoTitle: "PDF to JPG Converter Online",
     description:
-      "Convert PDF pages into high-quality JPG images online.",
+      "Convert PDF pages into high-quality JPG images quickly and conveniently online.",
+    keywords: [
+      "PDF to JPG",
+      "PDF to image",
+      "convert PDF to JPG",
+      "online PDF converter",
+    ],
   },
+
   "compress-pdf": {
     title: "Compress PDF",
+    seoTitle: "Compress PDF Online",
     description:
       "Reduce PDF file size online while preserving useful document quality.",
+    keywords: [
+      "compress PDF",
+      "reduce PDF size",
+      "PDF compressor online",
+      "small PDF file",
+    ],
   },
 };
 
 function formatToolTitle(slug: string) {
   return slug
     .split("-")
-    .map(
-      (word) =>
-        word.charAt(0).toUpperCase() + word.slice(1)
-    )
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
 
@@ -64,20 +118,46 @@ export async function generateMetadata({
   const { slug } = await params;
   const details = toolMetadata[slug];
 
+  const title = details?.seoTitle ?? formatToolTitle(slug);
+  const description =
+    details?.description ??
+    "Professional digital tool from Shivanandu Digital.";
+  const pageUrl = `https://www.shivanandudigital.com/tools/${slug}`;
+
   return {
-    title: details?.title ?? formatToolTitle(slug),
-    description:
-      details?.description ??
-      "Professional digital tool from Shivanandu Digital.",
+    title,
+    description,
+    keywords: details?.keywords,
+
     alternates: {
-      canonical: `/tools/${slug}`,
+      canonical: pageUrl,
     },
+
     openGraph: {
-      url: `/tools/${slug}`,
-      title: details?.title ?? formatToolTitle(slug),
-      description:
-        details?.description ??
-        "Professional digital tool from Shivanandu Digital.",
+      title: `${title} | Shivanandu Digital`,
+      description,
+      url: pageUrl,
+      siteName: "Shivanandu Digital",
+      locale: "en_IN",
+      type: "website",
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Shivanandu Digital`,
+      description,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
   };
 }
@@ -88,8 +168,45 @@ export default async function ToolPage({ params }: Props) {
   const title =
     toolMetadata[slug]?.title ?? formatToolTitle(slug);
 
+  const passportPhotoStructuredData =
+    slug === "passport-photo-maker"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "Shivanandu Digital Passport Photo Maker",
+          url: "https://www.shivanandudigital.com/tools/passport-photo-maker",
+          description:
+            "Create professional passport and visa photos online with AI background removal, ICAO composition checks and print-ready downloads.",
+          applicationCategory: "MultimediaApplication",
+          operatingSystem: "Any",
+          browserRequirements:
+            "Requires a modern web browser with JavaScript enabled",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "INR",
+          },
+          provider: {
+            "@type": "Organization",
+            name: "Shivanandu Digital",
+            url: "https://www.shivanandudigital.com",
+          },
+        }
+      : null;
+
   return (
     <main className="min-h-screen bg-slate-100 py-6 sm:py-8 lg:py-10">
+      {passportPhotoStructuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(
+              passportPhotoStructuredData
+            ).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
+
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
