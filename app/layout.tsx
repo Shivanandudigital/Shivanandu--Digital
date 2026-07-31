@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,48 +13,52 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shivanandudigital.com"),
+  metadataBase: new URL("https://www.shivanandudigital.com"),
+
   title: {
-    default: "Shivanandu Digital | Professional Digital Tools & Services",
+    default: "Shivanandu Digital | Online Services & Digital Tools",
     template: "%s | Shivanandu Digital",
   },
+
   description:
-    "Create passport photos, process PDFs, enhance images and access professional digital services with Shivanandu Digital.",
-  applicationName: "Shivanandu Digital",
+    "Professional online services and digital tools by Shivanandu Digital. Create passport photos and access reliable photo, PDF and digital services.",
+
+  keywords: [
+    "Shivanandu Digital",
+    "online digital services",
+    "passport photo maker",
+    "online passport photo",
+    "photo tools",
+    "PDF tools",
+    "background remover",
+    "digital services India",
+  ],
+
   authors: [{ name: "Shivanandu Digital" }],
   creator: "Shivanandu Digital",
   publisher: "Shivanandu Digital",
-  category: "Digital Services",
-  keywords: [
-    "Shivanandu Digital",
-    "passport photo maker",
-    "passport size photo",
-    "background remover",
-    "photo enhancer",
-    "JPG to PDF",
-    "PDF to JPG",
-    "PDF compressor",
-    "online digital tools",
-    "digital services India",
-  ],
+
   alternates: {
     canonical: "/",
   },
+
   openGraph: {
-    type: "website",
-    url: "/",
-    locale: "en_IN",
-    siteName: "Shivanandu Digital",
-    title: "Shivanandu Digital | Professional Digital Tools & Services",
+    title: "Shivanandu Digital | Online Services & Digital Tools",
     description:
-      "Professional online photo and document tools from Shivanandu Digital.",
+      "Professional online services and digital tools. Create passport photos and access reliable photo, PDF and digital services.",
+    url: "https://www.shivanandudigital.com",
+    siteName: "Shivanandu Digital",
+    locale: "en_IN",
+    type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Shivanandu Digital | Professional Digital Tools & Services",
+    title: "Shivanandu Digital | Online Services & Digital Tools",
     description:
-      "Professional online photo and document tools from Shivanandu Digital.",
+      "Professional online services and digital tools by Shivanandu Digital.",
   },
+
   robots: {
     index: true,
     follow: true,
@@ -68,13 +72,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#1d4ed8",
-  colorScheme: "light",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -82,10 +79,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en-IN"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
