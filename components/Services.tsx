@@ -102,6 +102,7 @@ export default function Services() {
                       description={tool.description}
                       icon={tool.icon}
                       href={`/tools/${tool.slug}`}
+                      status={tool.status}
                     />
                   ))}
                 </div>

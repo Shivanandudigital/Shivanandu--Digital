@@ -1,11 +1,25 @@
-export const tools = [
+export type ToolStatus = "ready" | "coming-soon";
+
+export type DigitalTool = {
+  id: number;
+  name: string;
+  slug: string;
+  category: string;
+  icon: string;
+  description: string;
+  status: ToolStatus;
+};
+
+export const tools: DigitalTool[] = [
   {
     id: 1,
     name: "Passport Photo Maker",
     slug: "passport-photo-maker",
     category: "Photo Tools",
     icon: "📷",
-    description: "Create passport size photos instantly.",
+    description:
+      "Create professional passport and visa photos instantly.",
+    status: "ready",
   },
   {
     id: 2,
@@ -13,7 +27,9 @@ export const tools = [
     slug: "photo-enhancer",
     category: "Photo Tools",
     icon: "✨",
-    description: "Enhance your photos with AI.",
+    description:
+      "Improve photo clarity, colour and overall quality.",
+    status: "ready",
   },
   {
     id: 3,
@@ -21,7 +37,9 @@ export const tools = [
     slug: "background-remover",
     category: "Photo Tools",
     icon: "✂️",
-    description: "Remove image background.",
+    description:
+      "Remove image backgrounds quickly and professionally.",
+    status: "ready",
   },
   {
     id: 4,
@@ -29,7 +47,9 @@ export const tools = [
     slug: "jpg-to-pdf",
     category: "PDF Tools",
     icon: "📄",
-    description: "Convert JPG into PDF.",
+    description:
+      "Convert one or multiple JPG images into a PDF.",
+    status: "ready",
   },
   {
     id: 5,
@@ -37,7 +57,9 @@ export const tools = [
     slug: "pdf-to-jpg",
     category: "PDF Tools",
     icon: "🖼️",
-    description: "Convert PDF pages to images.",
+    description:
+      "Convert PDF pages into high-quality JPG images.",
+    status: "ready",
   },
   {
     id: 6,
@@ -45,7 +67,9 @@ export const tools = [
     slug: "compress-pdf",
     category: "PDF Tools",
     icon: "📑",
-    description: "Reduce PDF file size.",
+    description:
+      "Reduce PDF file size while preserving useful quality.",
+    status: "ready",
   },
   {
     id: 7,
@@ -53,7 +77,9 @@ export const tools = [
     slug: "ocr",
     category: "AI Tools",
     icon: "🤖",
-    description: "Extract text from images.",
+    description:
+      "Extract editable text from images and scanned documents.",
+    status: "coming-soon",
   },
   {
     id: 8,
@@ -61,6 +87,8 @@ export const tools = [
     slug: "passport-service",
     category: "Online Services",
     icon: "🌐",
-    description: "Apply for passport assistance.",
+    description:
+      "Get professional assistance with passport applications.",
+    status: "coming-soon",
   },
 ];
