@@ -124,7 +124,7 @@ export default function OpenGraphImage() {
             style={{
               display: "flex",
               marginTop: "22px",
-              fontSize: "68px",
+             fontSize: "50px",
               lineHeight: 1.08,
               fontWeight: 900,
               letterSpacing: "-2px",
