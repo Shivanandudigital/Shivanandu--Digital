@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import About from "../components/About";
 import BrandStory from "../components/BrandStory";
 import Services from "../components/Services";
+import ContactForm from "../components/ContactForm";
 export default function Home() {
   return (
     <>
@@ -195,38 +196,7 @@ export default function Home() {
   </div>
 
   {/* Contact Form */}
-  <form className="mx-auto mt-10 max-w-2xl space-y-5 rounded-2xl bg-white p-4 shadow-xl sm:p-8">
-    <input
-      type="text"
-      placeholder="Your Name"
-      className="w-full border border-gray-300 rounded-lg px-4 py-3"
-    />
-
-    <input
-      type="email"
-      placeholder="Your Email"
-     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    <input
-      type="tel"
-      placeholder="Your Phone Number"
-    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    />
-
-    <textarea
-      rows={5}
-      placeholder="Your Message"
-     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
-    ></textarea>
-
-    <button
-      type="submit"
-      className="w-full rounded-lg bg-blue-700 px-8 py-3 font-semibold text-white transition hover:bg-blue-800 sm:w-auto"
-    >
-      Send Message
-    </button>
-  </form>
+ <ContactForm />
 
   {/* Google Map */}
   <div className="mt-10 overflow-hidden rounded-xl shadow-lg">
