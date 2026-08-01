@@ -5,6 +5,7 @@ import BackgroundRemoverTool from "@/components/background-remover/BackgroundRem
 import JpgToPdf from "@/components/jpg-to-pdf/JpgToPdf";
 import PdfToJpg from "@/components/pdf-to-jpg/PdfToJpg";
 import CompressPdf from "@/components/compress-pdf/CompressPdf";
+import CompressJpg from "@/components/compress-jpg/CompressJpg";
 
 type Props = {
   params: Promise<{
@@ -101,6 +102,20 @@ const toolMetadata: Record<string, ToolMetadata> = {
       "reduce PDF size",
       "PDF compressor online",
       "small PDF file",
+    ],
+  },
+
+  "compress-jpg": {
+    title: "Compress JPG",
+    seoTitle: "Compress JPG to Target KB Online",
+    description:
+      "Compress JPG images to a required file size in KB while preserving the best possible clarity and original proportions.",
+    keywords: [
+      "compress JPG",
+      "JPG compressor",
+      "reduce JPG size in KB",
+      "image compressor online",
+      "compress photo for online form",
     ],
   },
 };
@@ -230,6 +245,8 @@ export default async function ToolPage({ params }: Props) {
           <PdfToJpg />
         ) : slug === "compress-pdf" ? (
           <CompressPdf />
+        ) : slug === "compress-jpg" ? (
+          <CompressJpg />
         ) : (
           <div className="rounded-3xl bg-white p-16 text-center shadow-lg">
             <h2 className="mb-3 text-3xl font-bold">

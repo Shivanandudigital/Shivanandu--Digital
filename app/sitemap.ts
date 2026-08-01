@@ -6,6 +6,7 @@ const toolSlugs = [
   "passport-photo-maker",
   "photo-enhancer",
   "background-remover",
+  "compress-jpg",
   "jpg-to-pdf",
   "pdf-to-jpg",
   "compress-pdf",

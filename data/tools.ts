@@ -43,6 +43,16 @@ export const tools: DigitalTool[] = [
   },
   {
     id: 4,
+    name: "Compress JPG",
+    slug: "compress-jpg",
+    category: "Photo Tools",
+    icon: "🗜️",
+    description:
+      "Reduce JPG size to the required KB while protecting clarity.",
+    status: "ready",
+  },
+  {
+    id: 5,
     name: "JPG to PDF",
     slug: "jpg-to-pdf",
     category: "PDF Tools",
@@ -52,7 +62,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 5,
+    id: 6,
     name: "PDF to JPG",
     slug: "pdf-to-jpg",
     category: "PDF Tools",
@@ -62,7 +72,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 6,
+    id: 7,
     name: "Compress PDF",
     slug: "compress-pdf",
     category: "PDF Tools",
@@ -72,7 +82,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 7,
+    id: 8,
     name: "OCR",
     slug: "ocr",
     category: "AI Tools",
@@ -82,7 +92,7 @@ export const tools: DigitalTool[] = [
     status: "coming-soon",
   },
   {
-    id: 8,
+    id: 9,
     name: "Passport Service",
     slug: "passport-service",
     category: "Online Services",
