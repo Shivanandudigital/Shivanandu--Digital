@@ -5,7 +5,7 @@ import { jsPDF } from "jspdf";
 import type { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
 
 const MIN_TARGET_KB = 50;
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 7;
 
 function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) {
@@ -152,10 +152,8 @@ export default function CompressPdf() {
         data: await file.arrayBuffer(),
       }).promise;
       const targetBytes = Math.round(requestedKb * 1024);
-      const initialRatio = clamp(targetBytes / file.size, 0.02, 1);
-
-      let scale = clamp(1.8 * Math.sqrt(initialRatio * 1.4), 0.8, 1.8);
-      let jpegQuality = clamp(0.9 * Math.pow(initialRatio * 2.5, 0.22), 0.5, 0.9);
+      let scale = 1.9;
+      let jpegQuality = 0.92;
       let bestBlob: Blob | null = null;
       let smallestBlob: Blob | null = null;
 
@@ -167,13 +165,39 @@ export default function CompressPdf() {
         }
 
         if (blob.size <= targetBytes) {
-          bestBlob = blob;
-          break;
+          if (!bestBlob || blob.size > bestBlob.size) {
+            bestBlob = blob;
+          }
+
+          if (blob.size >= targetBytes * 0.92) {
+            break;
+          }
+
+          const increase = clamp(
+            Math.sqrt(targetBytes / blob.size) * 0.98,
+            1.04,
+            1.4,
+          );
+          scale = clamp(scale * increase, 0.68, 2.2);
+          jpegQuality = clamp(
+            jpegQuality * Math.pow(increase, 0.55),
+            0.42,
+            0.95,
+          );
+          continue;
         }
 
-        const adjustment = clamp(Math.sqrt(targetBytes / blob.size) * 0.97, 0.62, 0.92);
+        const adjustment = clamp(
+          Math.sqrt(targetBytes / blob.size) * 0.98,
+          0.68,
+          0.96,
+        );
         scale = clamp(scale * adjustment, 0.68, 1.8);
-        jpegQuality = clamp(jpegQuality * adjustment, 0.42, 0.9);
+        jpegQuality = clamp(
+          jpegQuality * Math.pow(adjustment, 0.55),
+          0.42,
+          0.95,
+        );
       }
 
       await source.cleanup();
