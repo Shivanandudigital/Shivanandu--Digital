@@ -30,20 +30,21 @@ export default function Home() {
     {/* Project 1 */}
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <Image
-        src="/images/project1.jpg"
-        alt="Business Website"
+        src="/images/portfolio/shivanandu-digital-platform.png"
+        alt="Shivanandu Digital website homepage preview"
         width={500}
         height={300}
-        className="w-full h-48 object-cover"
+        className="h-48 w-full object-cover object-top transition-transform duration-500 hover:scale-105"
       />
 
       <div className="p-6">
         <h3 className="text-xl font-bold mb-3">
-          Business Website
+          Shivanandu Digital Platform
         </h3>
 
         <p className="text-gray-600">
-          Modern responsive website for local businesses.
+          A responsive digital-services platform with professional tools,
+          branded content and direct WhatsApp support.
         </p>
       </div>
     </div>
@@ -51,20 +52,21 @@ export default function Home() {
     {/* Project 2 */}
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <Image
-        src="/images/project2.jpg"
-        alt="E-Commerce Store"
+        src="/images/portfolio/passport-photo-maker.png"
+        alt="Shivanandu Digital Passport Photo Maker interface"
         width={500}
         height={300}
-        className="w-full h-48 object-cover"
+        className="h-48 w-full object-cover object-top transition-transform duration-500 hover:scale-105"
       />
 
       <div className="p-6">
         <h3 className="text-xl font-bold mb-3">
-          E-Commerce Store
+          Passport Photo Maker
         </h3>
 
         <p className="text-gray-600">
-          Online store with payment integration.
+          An AI-powered passport photo editor with background removal, ICAO
+          checks and professional download options.
         </p>
       </div>
     </div>
@@ -72,20 +74,21 @@ export default function Home() {
     {/* Project 3 */}
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <Image
-        src="/images/project3.jpg"
-        alt="SEO Project"
+        src="/images/portfolio/background-remover.png"
+        alt="Shivanandu Digital Background Remover before and after result"
         width={500}
         height={300}
-        className="w-full h-48 object-cover"
+        className="h-48 w-full object-cover object-top transition-transform duration-500 hover:scale-105"
       />
 
       <div className="p-6">
         <h3 className="text-xl font-bold mb-3">
-          SEO Project
+          Background Remover
         </h3>
 
         <p className="text-gray-600">
-          Improved rankings and organic traffic growth.
+          A browser-based AI tool that removes image backgrounds and delivers
+          a reusable transparent PNG in seconds.
         </p>
       </div>
     </div>
