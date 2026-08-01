@@ -5,6 +5,7 @@ import About from "../components/About";
 import BrandStory from "../components/BrandStory";
 import Services from "../components/Services";
 import ContactForm from "../components/ContactForm";
+import Testimonials from "../components/Testimonials";
 export default function Home() {
   return (
     <>
@@ -96,56 +97,7 @@ export default function Home() {
   </div>
 </section>
 {/* Testimonials */}
-<section className="bg-gray-100 px-4 py-14 sm:px-6 sm:py-20">
-  <div className="max-w-6xl mx-auto">
-    <h2 className="mb-8 text-center text-3xl font-bold sm:mb-12 sm:text-4xl">
-      What Our Clients Say
-    </h2>
-
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <p className="text-gray-600 mb-4">
-          &ldquo;Shivanandu Digital created an amazing website for our business.
-          Professional service and excellent support.&rdquo;
-        </p>
-        <h3 className="font-bold text-lg">
-          Rajesh Sharma
-        </h3>
-        <p className="text-gray-500">
-          Business Owner
-        </p>
-      </div>
-
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <p className="text-gray-600 mb-4">
-          &ldquo;Our Google rankings improved significantly after their SEO work.
-          Highly recommended.&rdquo;
-        </p>
-        <h3 className="font-bold text-lg">
-          Priya Das
-        </h3>
-        <p className="text-gray-500">
-          Marketing Manager
-        </p>
-      </div>
-
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <p className="text-gray-600 mb-4">
-          &ldquo;Great communication, fast delivery and quality digital marketing
-          services.&rdquo;
-        </p>
-        <h3 className="font-bold text-lg">
-          Amit Roy
-        </h3>
-        <p className="text-gray-500">
-          Entrepreneur
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
+<Testimonials />
 
 {/* Floating WhatsApp Button */}
 <a
