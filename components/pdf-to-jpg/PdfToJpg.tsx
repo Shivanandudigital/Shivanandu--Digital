@@ -8,12 +8,36 @@ type RenderedPage = {
   dataUrl: string;
 };
 
+type JpgQuality = "standard" | "high" | "maximum";
+
+const qualityOptions: Record<
+  JpgQuality,
+  { label: string; value: number; description: string }
+> = {
+  standard: {
+    label: "Standard (85%)",
+    value: 0.85,
+    description: "Smaller files for quick sharing",
+  },
+  high: {
+    label: "High Quality (92%)",
+    value: 0.92,
+    description: "Best balance of clarity and file size",
+  },
+  maximum: {
+    label: "Maximum Quality (100%)",
+    value: 1,
+    description: "Largest files with maximum JPG quality",
+  },
+};
+
 export default function PdfToJpg() {
   const [pages, setPages] = useState<RenderedPage[]>([]);
   const [selectedPage, setSelectedPage] = useState<number | null>(null);
   const [fileName, setFileName] = useState("document");
   const [progress, setProgress] = useState(0);
   const [isConverting, setIsConverting] = useState(false);
+  const [quality, setQuality] = useState<JpgQuality>("high");
   const [error, setError] = useState<string | null>(null);
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -55,7 +79,10 @@ export default function PdfToJpg() {
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvas, canvasContext: context, viewport }).promise;
-        renderedPages.push({ pageNumber, dataUrl: canvas.toDataURL("image/jpeg", 0.92) });
+        renderedPages.push({
+          pageNumber,
+          dataUrl: canvas.toDataURL("image/jpeg", qualityOptions[quality].value),
+        });
         setProgress(Math.round((pageNumber / pdfDocument.numPages) * 100));
       }
 
@@ -91,6 +118,41 @@ export default function PdfToJpg() {
         </label>
       </div>
 
+      <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,260px)_1fr] sm:items-end">
+          <label className="block text-sm font-semibold text-slate-700">
+            JPG quality
+            <select
+              value={quality}
+              disabled={isConverting}
+              onChange={(event) => {
+                setQuality(event.target.value as JpgQuality);
+                setPages([]);
+                setSelectedPage(null);
+                setProgress(0);
+                setError(null);
+              }}
+              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-slate-800 disabled:cursor-wait disabled:opacity-60"
+            >
+              {(Object.keys(qualityOptions) as JpgQuality[]).map((option) => (
+                <option key={option} value={option}>
+                  {qualityOptions[option].label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="rounded-xl bg-white px-4 py-3 text-sm text-slate-600">
+            <p className="font-semibold text-slate-800">
+              {qualityOptions[quality].description}
+            </p>
+            <p className="mt-1">
+              Choose the quality before uploading. Changing it clears the current conversion.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {!pages.length && !isConverting ? (
         <label className="mt-7 flex min-h-80 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-orange-300 bg-orange-50/60 p-8 text-center hover:border-orange-500">
           <span className="text-5xl" aria-hidden="true">▤</span>
@@ -110,7 +172,7 @@ export default function PdfToJpg() {
       {pages.length > 0 && (
         <div className="mt-7">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-slate-600">{pages.length} page{pages.length === 1 ? "" : "s"} ready. Select a page to download.</p>
+            <p className="text-sm text-slate-600">{pages.length} page{pages.length === 1 ? "" : "s"} ready at {qualityOptions[quality].label}. Select a page to download.</p>
             <button type="button" onClick={() => { const page = pages.find((item) => item.pageNumber === selectedPage); if (page) downloadPage(page); }} className="self-start rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700">Download selected JPG</button>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
