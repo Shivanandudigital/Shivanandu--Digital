@@ -7,6 +7,7 @@ const toolSlugs = [
   "photo-enhancer",
   "background-remover",
   "compress-jpg",
+  "image-resizer",
   "jpg-to-pdf",
   "pdf-to-jpg",
   "compress-pdf",

@@ -53,6 +53,16 @@ export const tools: DigitalTool[] = [
   },
   {
     id: 5,
+    name: "Image Resizer",
+    slug: "image-resizer",
+    category: "Photo Tools",
+    icon: "↔️",
+    description:
+      "Resize JPG, PNG and WebP images to exact pixels or percentages.",
+    status: "ready",
+  },
+  {
+    id: 6,
     name: "JPG to PDF",
     slug: "jpg-to-pdf",
     category: "PDF Tools",
@@ -62,7 +72,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 6,
+    id: 7,
     name: "PDF to JPG",
     slug: "pdf-to-jpg",
     category: "PDF Tools",
@@ -72,7 +82,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 7,
+    id: 8,
     name: "Compress PDF",
     slug: "compress-pdf",
     category: "PDF Tools",
@@ -82,7 +92,7 @@ export const tools: DigitalTool[] = [
     status: "ready",
   },
   {
-    id: 8,
+    id: 9,
     name: "OCR",
     slug: "ocr",
     category: "AI Tools",
@@ -92,7 +102,7 @@ export const tools: DigitalTool[] = [
     status: "coming-soon",
   },
   {
-    id: 9,
+    id: 10,
     name: "Passport Service",
     slug: "passport-service",
     category: "Online Services",

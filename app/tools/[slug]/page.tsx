@@ -6,6 +6,7 @@ import JpgToPdf from "@/components/jpg-to-pdf/JpgToPdf";
 import PdfToJpg from "@/components/pdf-to-jpg/PdfToJpg";
 import CompressPdf from "@/components/compress-pdf/CompressPdf";
 import CompressJpg from "@/components/compress-jpg/CompressJpg";
+import ImageResizer from "@/components/image-resizer/ImageResizer";
 
 type Props = {
   params: Promise<{
@@ -116,6 +117,22 @@ const toolMetadata: Record<string, ToolMetadata> = {
       "reduce JPG size in KB",
       "image compressor online",
       "compress photo for online form",
+    ],
+  },
+
+  "image-resizer": {
+    title: "Image Resizer",
+    seoTitle: "Resize Image Online in Pixels and KB",
+    description:
+      "Resize JPG, PNG and WebP images online by pixels, percentage or ready-made presets, with aspect ratio lock, output quality and optional target KB control.",
+    keywords: [
+      "image resizer",
+      "resize image online",
+      "resize image in pixels",
+      "photo resizer",
+      "resize image in KB",
+      "passport photo resizer",
+      "signature image resizer",
     ],
   },
 };
@@ -247,6 +264,8 @@ export default async function ToolPage({ params }: Props) {
           <CompressPdf />
         ) : slug === "compress-jpg" ? (
           <CompressJpg />
+        ) : slug === "image-resizer" ? (
+          <ImageResizer />
         ) : (
           <div className="rounded-3xl bg-white p-16 text-center shadow-lg">
             <h2 className="mb-3 text-3xl font-bold">
