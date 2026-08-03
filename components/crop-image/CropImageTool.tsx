@@ -76,10 +76,17 @@ export default function CropImageTool() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => () => {
+useEffect(() => {
+  return () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
+  };
+}, [imageUrl]);
+
+useEffect(() => {
+  return () => {
     if (resultUrl) URL.revokeObjectURL(resultUrl);
-  }, [imageUrl, resultUrl]);
+  };
+}, [resultUrl]);
 
   function clearResult() {
     if (resultUrl) URL.revokeObjectURL(resultUrl);
