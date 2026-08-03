@@ -209,7 +209,7 @@ export default function ImageResizer() {
       if (targetKb && format !== "image/png" && Number.isFinite(requestedKb) && requestedKb >= 5) {
         const targetBytes = requestedKb * 1024;
         let low = 0.1;
-        let high = quality / 100;
+let high = 1;
         let best: Blob | null = blob.size <= targetBytes ? blob : null;
         for (let step = 0; step < 10; step += 1) {
           const candidateQuality = (low + high) / 2;
