@@ -7,6 +7,7 @@ import PdfToJpg from "@/components/pdf-to-jpg/PdfToJpg";
 import CompressPdf from "@/components/compress-pdf/CompressPdf";
 import CompressJpg from "@/components/compress-jpg/CompressJpg";
 import ImageResizer from "@/components/image-resizer/ImageResizer";
+import CropImageTool from "@/components/crop-image/CropImageTool";
 
 type Props = {
   params: Promise<{
@@ -135,6 +136,7 @@ const toolMetadata: Record<string, ToolMetadata> = {
       "signature image resizer",
     ],
   },
+  "crop-image": { title: "Crop Image", seoTitle: "Crop Image Online Free", description: "Crop, rotate and flip images online.", keywords: ["crop image", "crop photo online"] },
 };
 
 function formatToolTitle(slug: string) {
@@ -266,6 +268,8 @@ export default async function ToolPage({ params }: Props) {
           <CompressJpg />
         ) : slug === "image-resizer" ? (
           <ImageResizer />
+        ) : slug === "crop-image" ? (
+          <CropImageTool />
         ) : (
           <div className="rounded-3xl bg-white p-16 text-center shadow-lg">
             <h2 className="mb-3 text-3xl font-bold">
