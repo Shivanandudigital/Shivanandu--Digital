@@ -6,6 +6,8 @@ import BrandStory from "../components/BrandStory";
 import Services from "../components/Services";
 import ContactForm from "../components/ContactForm";
 import Testimonials from "../components/Testimonials";
+import CustomerReviewsSection from "../components/CustomerReviewsSection";
+
 export default function Home() {
   return (
     <>
@@ -96,6 +98,9 @@ export default function Home() {
 
   </div>
 </section>
+{/* Reviews */}
+<CustomerReviewsSection />
+
 {/* Testimonials */}
 <Testimonials />
 
