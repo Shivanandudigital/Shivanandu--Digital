@@ -12,7 +12,12 @@ export default function Hero() {
             Online Services • Smart Digital Tools
           </p>
 
-          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+          <h2 className="mb-4 text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.2em] text-white/95 drop-shadow-[0_2px_10px_rgba(2,6,23,0.35)] sm:mb-5 sm:text-[2.15rem] sm:tracking-[0.24em] lg:mb-6 lg:text-[2.8rem] lg:tracking-[0.28em]">
+            <span className="block font-[Georgia,Times_New_Roman,serif] sm:inline">Shivanandu</span>{" "}
+            <span className="block font-[Georgia,Times_New_Roman,serif] text-yellow-300 sm:inline">Digital Center</span>
+          </h2>
+
+          <h1 className="text-[1.25rem] font-semibold leading-tight text-white/95 sm:text-[1.55rem] lg:text-[2.1rem]">
             Everyday Digital Work,
             <br />
             <span className="text-yellow-300">
