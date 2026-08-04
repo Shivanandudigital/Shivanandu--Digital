@@ -10,6 +10,7 @@ const colors = [
   { name: "Blue", value: "#87CEEB" },
   { name: "Red", value: "#ff4d4d" },
   { name: "Gray", value: "#dddddd" },
+  { name: "Transparent", value: "transparent" },
 ];
 
 export default function BackgroundSelector({

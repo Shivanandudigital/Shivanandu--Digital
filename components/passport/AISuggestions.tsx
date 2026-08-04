@@ -16,34 +16,32 @@ export default function AISuggestions({
   const suggestions: string[] = [];
 
   if (!faceDetected) {
-    suggestions.push("Upload a photo with one clearly visible face.");
+    suggestions.push("Choose a photo that clearly shows the face.");
   }
 
   if (!centered) {
-    suggestions.push("Move your face to the center of the frame.");
+    suggestions.push("Adjust the crop so the face stays centered.");
   }
 
   if (!backgroundOk) {
-    suggestions.push("Use a plain white or light-colored background.");
+    suggestions.push("Try a solid background that contrasts with the subject.");
   }
 
   if (headStatus === "small") {
-    suggestions.push("Zoom in slightly so your head fills more of the frame.");
+    suggestions.push("Use a little more zoom so the head appears larger.");
   }
 
   if (headStatus === "large") {
-    suggestions.push("Zoom out slightly to reduce head size.");
+    suggestions.push("Use a little less zoom so the head appears smaller.");
   }
 
   if (suggestions.length === 0) {
-    suggestions.push("Excellent! Your photo meets all current checks.");
+    suggestions.push("Review the preview and adjust the crop if needed.");
   }
 
   return (
     <div className="h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
-      <h3 className="mb-4 text-lg font-bold">
-        AI Suggestions
-      </h3>
+      <h3 className="mb-4 text-lg font-bold">Simple Notes</h3>
 
       <div className="space-y-3">
         {suggestions.map((item, index) => (
@@ -51,7 +49,7 @@ export default function AISuggestions({
             key={index}
             className="rounded-lg bg-blue-50 p-3 text-sm text-gray-700"
           >
-            💡 {item}
+            • {item}
           </div>
         ))}
       </div>

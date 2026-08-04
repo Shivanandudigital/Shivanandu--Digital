@@ -51,7 +51,7 @@ export default function TopToolbar({
 
         <div>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-  AI Tools
+  Background Removal
 </h3>
 
           <BackgroundRemover

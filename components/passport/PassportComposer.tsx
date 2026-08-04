@@ -26,10 +26,8 @@ type Props = {
   image: string;
   size: string;
   backgroundColor: string;
-
   headSize: number;
   faceDetected: boolean;
-
   composition: Composition;
   face: FaceData;
 };
@@ -60,19 +58,12 @@ export default function PassportComposer({
         setError(undefined);
 
         const sourceImage = new Image();
-
-        // Blob URL এবং data URL—দুটোর জন্যই safe।
         sourceImage.decoding = "async";
         sourceImage.src = image;
 
         await new Promise<void>((resolve, reject) => {
           sourceImage.onload = () => resolve();
-
-          sourceImage.onerror = () => {
-            reject(
-              new Error("Passport source image could not be loaded.")
-            );
-          };
+          sourceImage.onerror = () => reject(new Error("Passport source image could not be loaded."));
         });
 
         const composedImage = await composePassportPhoto(
@@ -92,7 +83,6 @@ export default function PassportComposer({
         if (cancelled) return;
 
         setOutput(undefined);
-
         setError(
           caughtError instanceof Error
             ? caughtError.message
@@ -106,32 +96,19 @@ export default function PassportComposer({
     return () => {
       cancelled = true;
     };
-  }, [
-    image,
-    size,
-    backgroundColor,
-    headSize,
-    faceDetected,
-    composition,
-    face,
-  ]);
+  }, [image, size, backgroundColor, headSize, faceDetected, composition, face]);
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h3 className="text-base font-bold text-gray-800">
-        AI Passport Composition
-      </h3>
+      <h3 className="text-base font-bold text-gray-800">Final Composition Preview</h3>
 
       <p className="mt-1 text-xs text-gray-500">
-        Final output uses the same professional composition engine as the live
-        preview.
+        This preview uses the same final composition as the downloaded files.
       </p>
 
       <div className="mt-4 flex min-h-[260px] items-center justify-center rounded-xl bg-gray-50 p-4">
         {error ? (
-          <p className="text-center text-sm font-medium text-red-600">
-            {error}
-          </p>
+          <p className="text-center text-sm font-medium text-red-600">{error}</p>
         ) : output ? (
           <img
             src={output}
@@ -139,9 +116,7 @@ export default function PassportComposer({
             className="max-h-[360px] w-auto rounded-md border border-gray-300 bg-white object-contain"
           />
         ) : (
-          <p className="text-sm text-gray-500">
-            Detecting face and preparing output…
-          </p>
+          <p className="text-sm text-gray-500">Preparing preview…</p>
         )}
       </div>
     </section>

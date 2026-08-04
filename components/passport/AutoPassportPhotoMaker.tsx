@@ -141,7 +141,7 @@ export default function AutoPassportPhotoMaker() {
       setPhotoData({ image: portraitImage, landmarks });
       setOutput(passportPhoto);
       setState("complete");
-      setMessage("Your automatic passport photo is ready to download.");
+      setMessage("The prepared photo is ready to review and download.");
       URL.revokeObjectURL(sourceUrl);
       if (transparentUrl) URL.revokeObjectURL(transparentUrl);
     } catch (cause) {

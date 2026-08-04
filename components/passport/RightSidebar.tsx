@@ -1,7 +1,6 @@
 "use client";
 
 import PreviewPanel from "./PreviewPanel";
-import CompliancePanel from "./CompliancePanel";
 
 type FaceData = {
   forehead: { x: number; y: number };
@@ -21,14 +20,10 @@ type Props = {
   composition: Composition;
   face: FaceData;
   backgroundColor: string;
-
-  faceDetected: boolean;
-  centered: boolean;
-  backgroundOk: boolean;
-  eyeLineOk: boolean;
-
-  headSize: number;
-  headStatus: "perfect" | "small" | "large" | "unknown";
+  sizeName: string;
+  brightness: number;
+  contrast: number;
+  saturation: number;
 };
 
 export default function RightSidebar({
@@ -36,12 +31,10 @@ export default function RightSidebar({
   composition,
   face,
   backgroundColor,
-  faceDetected,
-  centered,
-  backgroundOk,
-  eyeLineOk,
-  headSize,
-  headStatus,
+  sizeName,
+  brightness,
+  contrast,
+  saturation,
 }: Props) {
   return (
     <div className="space-y-6">
@@ -52,14 +45,32 @@ export default function RightSidebar({
         backgroundColor={backgroundColor}
       />
 
-      <CompliancePanel
-        faceDetected={faceDetected}
-        centered={centered}
-        backgroundOk={backgroundOk}
-        eyeLineOk={eyeLineOk}
-        headSize={headSize}
-        headStatus={headStatus}
-      />
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+        <h3 className="text-lg font-bold text-gray-900">Output Summary</h3>
+
+        <div className="mt-4 space-y-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between gap-4">
+            <span>Passport size</span>
+            <span className="font-medium text-gray-800">{sizeName}</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span>Background</span>
+            <span className="font-medium text-gray-800">{backgroundColor}</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span>Brightness</span>
+            <span className="font-medium text-gray-800">{brightness}%</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span>Contrast</span>
+            <span className="font-medium text-gray-800">{contrast}%</span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span>Saturation</span>
+            <span className="font-medium text-gray-800">{saturation}%</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

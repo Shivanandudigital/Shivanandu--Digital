@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { renderPassport } from "@/lib/vision/professional/passportRenderer";
+import { renderPassportToCanvas } from "@/lib/composePassport";
 
 type FaceData = {
   forehead: { x: number; y: number };
@@ -18,31 +18,24 @@ type Composition = {
 
 type Props = {
   image: HTMLImageElement | null;
-
-  /**
-   * পুরোনো component compatibility বজায় রাখার জন্য রাখা হয়েছে।
-   * Final framing professional AI renderer নিজে calculate করবে।
-   */
   composition: Composition;
-
   face: FaceData;
-
   width?: number;
   height?: number;
-
   backgroundColor?: string;
+  transparentBackground?: boolean;
 };
 
 export default function PortraitCanvas({
   image,
-  composition: _composition,
+  composition,
   face,
   width = 210,
   height = 270,
   backgroundColor = "#ffffff",
+  transparentBackground = false,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  void _composition;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -59,39 +52,21 @@ export default function PortraitCanvas({
       return;
     }
 
-    const result = renderPassport({
-      canvas,
-      image,
-      face,
-
-      size: "35x45",
-
-      /**
-       * নির্বাচিত colour passport canvas-এর ভেতরে আঁকা হবে।
-       */
-      backgroundColor,
-
-      /**
-       * Transparent mode আলাদাভাবে নির্বাচন না করা পর্যন্ত
-       * canvas সবসময় solid background ব্যবহার করবে।
-       */
-      transparentBackground: false,
-
-      /**
-       * Professional natural framing এবং auto-straight চালু।
-       */
-      autoCompose: true,
-
-      smoothingQuality: "high",
-    });
-
-    if (!result.success) {
-      console.error(
-        "Passport preview rendering failed:",
-        result.error
-      );
+    try {
+      renderPassportToCanvas({
+        canvas,
+        image,
+        face,
+        size: "35x45",
+        backgroundColor,
+        transparentBackground,
+        composition,
+        smoothingQuality: "high",
+      });
+    } catch (error) {
+      console.error("Passport preview rendering failed:", error);
     }
-  }, [image, face, backgroundColor]);
+  }, [image, face, composition, backgroundColor, transparentBackground]);
 
   return (
     <canvas
@@ -101,7 +76,7 @@ export default function PortraitCanvas({
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        backgroundColor,
+        backgroundColor: transparentBackground ? "transparent" : backgroundColor,
       }}
     />
   );
