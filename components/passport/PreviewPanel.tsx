@@ -2,46 +2,55 @@
 
 import PortraitCanvas from "./PortraitCanvas";
 
-type FaceData = {
-  forehead: { x: number; y: number };
-  chin: { x: number; y: number };
-  leftEye: { x: number; y: number };
-  rightEye: { x: number; y: number };
-};
-
-type Composition = {
-  scale: number;
-  offsetX: number;
-  offsetY: number;
+type CropArea = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 type Props = {
-  image: HTMLImageElement | null;
-  composition: Composition;
-  face: FaceData;
+  sourceImage: string | HTMLImageElement | null;
+  cropArea?: CropArea | null;
+  rotation?: number;
+  zoom?: number;
+  size?: string;
   backgroundColor?: string;
+  transparentBackground?: boolean;
+  adjustments?: {
+    brightness?: number;
+    contrast?: number;
+    saturation?: number;
+  };
 };
 
 export default function PreviewPanel({
-  image,
-  composition,
-  face,
+  sourceImage,
+  cropArea,
+  rotation = 0,
+  zoom = 1,
+  size = "35x45",
   backgroundColor = "#ffffff",
+  transparentBackground = false,
+  adjustments,
 }: Props) {
-  const transparentBackground = backgroundColor === "transparent";
+  const effectiveTransparentBackground = transparentBackground || backgroundColor === "transparent";
 
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
       <h3 className="mb-4 text-xl font-bold text-gray-900">Final Preview</h3>
 
       <div className="flex min-h-[302px] items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-100 p-3 sm:min-h-[318px] sm:p-6">
-        {image ? (
+        {sourceImage ? (
           <PortraitCanvas
-            image={image}
-            composition={composition}
-            face={face}
+            sourceImage={sourceImage}
+            cropArea={cropArea}
+            rotation={rotation}
+            zoom={zoom}
+            size={size}
             backgroundColor={backgroundColor}
-            transparentBackground={transparentBackground}
+            transparentBackground={effectiveTransparentBackground}
+            adjustments={adjustments}
             width={210}
             height={270}
           />

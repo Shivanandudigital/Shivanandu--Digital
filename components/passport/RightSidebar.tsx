@@ -2,23 +2,19 @@
 
 import PreviewPanel from "./PreviewPanel";
 
-type FaceData = {
-  forehead: { x: number; y: number };
-  chin: { x: number; y: number };
-  leftEye: { x: number; y: number };
-  rightEye: { x: number; y: number };
-};
-
-type Composition = {
-  scale: number;
-  offsetX: number;
-  offsetY: number;
+type CropArea = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 type Props = {
-  image: HTMLImageElement | null;
-  composition: Composition;
-  face: FaceData;
+  sourceImage: string | HTMLImageElement | null;
+  cropArea?: CropArea | null;
+  rotation?: number;
+  zoom?: number;
+  size?: string;
   backgroundColor: string;
   sizeName: string;
   brightness: number;
@@ -27,9 +23,11 @@ type Props = {
 };
 
 export default function RightSidebar({
-  image,
-  composition,
-  face,
+  sourceImage,
+  cropArea,
+  rotation = 0,
+  zoom = 1,
+  size = "35x45",
   backgroundColor,
   sizeName,
   brightness,
@@ -39,9 +37,11 @@ export default function RightSidebar({
   return (
     <div className="space-y-6">
       <PreviewPanel
-        image={image}
-        composition={composition}
-        face={face}
+        sourceImage={sourceImage}
+        cropArea={cropArea}
+        rotation={rotation}
+        zoom={zoom}
+        size={size}
         backgroundColor={backgroundColor}
       />
 

@@ -1,72 +1,71 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { renderPassportToCanvas } from "@/lib/composePassport";
+import { renderFinalPassportCanvas } from "@/lib/composePassport";
 
-type FaceData = {
-  forehead: { x: number; y: number };
-  chin: { x: number; y: number };
-  leftEye: { x: number; y: number };
-  rightEye: { x: number; y: number };
-};
-
-type Composition = {
-  scale: number;
-  offsetX: number;
-  offsetY: number;
+type CropArea = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 type Props = {
-  image: HTMLImageElement | null;
-  composition: Composition;
-  face: FaceData;
+  sourceImage: string | HTMLImageElement | null;
+  cropArea?: CropArea | null;
+  rotation?: number;
+  zoom?: number;
+  size?: string;
   width?: number;
   height?: number;
   backgroundColor?: string;
   transparentBackground?: boolean;
+  adjustments?: {
+    brightness?: number;
+    contrast?: number;
+    saturation?: number;
+  };
 };
 
 export default function PortraitCanvas({
-  image,
-  composition,
-  face,
+  sourceImage,
+  cropArea,
+  rotation = 0,
+  zoom = 1,
+  size = "35x45",
   width = 210,
   height = 270,
   backgroundColor = "#ffffff",
   transparentBackground = false,
+  adjustments,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
 
-    if (!canvas || !image) {
+    if (!canvas || !sourceImage) {
       return;
     }
 
-    if (
-      !image.complete ||
-      image.naturalWidth <= 0 ||
-      image.naturalHeight <= 0
-    ) {
-      return;
-    }
-
-    try {
-      renderPassportToCanvas({
-        canvas,
-        image,
-        face,
-        size: "35x45",
-        backgroundColor,
-        transparentBackground,
-        composition,
-        smoothingQuality: "high",
-      });
-    } catch (error) {
-      console.error("Passport preview rendering failed:", error);
-    }
-  }, [image, face, composition, backgroundColor, transparentBackground]);
+    void (async () => {
+      try {
+        await renderFinalPassportCanvas({
+          canvas,
+          sourceImage,
+          size,
+          backgroundColor,
+          cropArea: cropArea ?? undefined,
+          rotation,
+          zoom,
+          transparentBackground,
+          adjustments,
+        });
+      } catch (error) {
+        console.error("Passport preview rendering failed:", error);
+      }
+    })();
+  }, [adjustments, backgroundColor, cropArea, rotation, size, sourceImage, transparentBackground, zoom]);
 
   return (
     <canvas

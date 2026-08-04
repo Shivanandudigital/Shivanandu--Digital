@@ -9,18 +9,13 @@ import RightSidebar from "./RightSidebar";
 import TopToolbar from "./TopToolbar";
 import LeftSidebar from "./LeftSidebar";
 
-import { detectFace } from "@/lib/faceDetector";
 import { cropImage } from "@/lib/cropImage";
 import { getPassportSize } from "@/lib/passportSizes";
 import { downloadFile } from "@/lib/downloadImage";
 import { downloadPdf } from "@/lib/downloadPdf";
 import { createPrintSheet } from "@/lib/createPrintSheet";
 import { removeBackground } from "@imgly/background-removal";
-import { analyzeFace } from "@/lib/vision/faceAnalyzer";
-import { calculateAutoComposition } from "@/lib/vision/professional/autoComposition";
-import { getPassportLayoutFromSize } from "@/lib/vision/professional/passportLayout";
-import { renderPassportToCanvas } from "@/lib/composePassport";
-import { canvasToDataUrl } from "@/lib/vision/professional/passportRenderer";
+import { renderFinalPassportCanvas } from "@/lib/composePassport";
 
 
 
@@ -52,23 +47,6 @@ const [backgroundColor, setBackgroundColor] =
 const [brightness, setBrightness] = useState(100);
 const [contrast, setContrast] = useState(100);
 const [saturation, setSaturation] = useState(100);
-
-const [faceDetected, setFaceDetected] = useState(false);
-const [previewImage, setPreviewImage] = useState<HTMLImageElement | null>(null);
-
-const [face, setFace] = useState({
-  forehead: { x: 0, y: 0 },
-  chin: { x: 0, y: 0 },
-  leftEye: { x: 0, y: 0 },
-  rightEye: { x: 0, y: 0 },
-});
-
-const [composition, setComposition] =
-  useState({
-    scale: 1,
-    offsetX: 0,
-    offsetY: 0,
-  });
   const currentSize = useMemo(
     () => getPassportSize(size),
     [size]
@@ -97,40 +75,46 @@ const [composition, setComposition] =
     [image, rotation, backgroundColor, transparentImage]
   );
 const createProfessionalDownload = useCallback(
-  (mimeType: "image/jpeg" | "image/png") => {
-    if (!previewImage || !faceDetected) {
-      throw new Error("The passport photo is not ready yet.");
+  async (mimeType: "image/jpeg" | "image/png") => {
+    if (!croppedAreaPixels) {
+      throw new Error("Please adjust the crop area before downloading.");
     }
 
     const canvas = document.createElement("canvas");
-    renderPassportToCanvas({
+    const renderedCanvas = await renderFinalPassportCanvas({
       canvas,
-      image: previewImage,
-      face,
+      sourceImage: transparentImage ?? image,
       size,
       backgroundColor,
+      cropArea: {
+        x: croppedAreaPixels.x,
+        y: croppedAreaPixels.y,
+        width: croppedAreaPixels.width,
+        height: croppedAreaPixels.height,
+      },
+      rotation,
+      zoom,
       transparentBackground: backgroundColor === "transparent",
-      composition,
-      smoothingQuality: "high",
       adjustments: {
         brightness,
         contrast,
         saturation,
       },
+      mimeType,
+      quality: mimeType === "image/jpeg" ? 0.95 : 1,
     });
 
-    return canvasToDataUrl(
-      canvas,
+    return renderedCanvas.toDataURL(
       mimeType,
       mimeType === "image/jpeg" ? 0.95 : 1
     );
   },
-  [backgroundColor, brightness, composition, contrast, face, faceDetected, previewImage, saturation, size]
+  [backgroundColor, brightness, contrast, croppedAreaPixels, image, rotation, saturation, size, transparentImage, zoom]
 );
 
 async function downloadJPG() {
   try {
-    const jpg = createProfessionalDownload("image/jpeg");
+    const jpg = await createProfessionalDownload("image/jpeg");
     downloadFile(jpg, "passport-photo.jpg");
   } catch (err) {
     console.error(err);
@@ -140,7 +124,7 @@ async function downloadJPG() {
 
 async function downloadPNG() {
   try {
-    const png = createProfessionalDownload("image/png");
+    const png = await createProfessionalDownload("image/png");
     downloadFile(png, "passport-photo.png");
   } catch (err) {
     console.error(err);
@@ -150,7 +134,7 @@ async function downloadPNG() {
 
 async function downloadPDF() {
   try {
-    const jpg = createProfessionalDownload("image/jpeg");
+    const jpg = await createProfessionalDownload("image/jpeg");
     downloadPdf(jpg);
   } catch (err) {
     console.error(err);
@@ -160,8 +144,7 @@ async function downloadPDF() {
 
 async function downloadPrintSheet() {
   try {
-    const passportPhoto =
-      createProfessionalDownload("image/jpeg");
+    const passportPhoto = await createProfessionalDownload("image/jpeg");
     const sheet = await createPrintSheet(passportPhoto);
 
     downloadFile(
@@ -176,89 +159,7 @@ async function downloadPrintSheet() {
 
 function handleAutoZoom() {
   setZoom(1);
-
-  setComposition((previous) => ({
-    ...previous,
-    scale: 1,
-  }));
 }
-
-const runFaceDetection = useCallback(async (imageUrl: string) => {
-
-  try {
-    const img = new Image();
-    img.src = imageUrl;
-
-    await new Promise((resolve, reject) => {
-      img.onload = () => resolve(true);
-      img.onerror = () => reject(new Error("The selected image could not be loaded."));
-    });
-
-    setPreviewImage(img);
-
-    const result = await detectFace(img);
-
-    if (!result.faceLandmarks || result.faceLandmarks.length === 0) {
-      setFaceDetected(false);
-      setFace({
-        forehead: { x: 0, y: 0 },
-        chin: { x: 0, y: 0 },
-        leftEye: { x: 0, y: 0 },
-        rightEye: { x: 0, y: 0 },
-      });
-      return;
-    }
-
-    setFaceDetected(true);
-
-    const landmarks = result.faceLandmarks[0];
-    const detectedFace = analyzeFace(landmarks);
-    setFace({
-      forehead: detectedFace.forehead,
-      chin: detectedFace.chin,
-      leftEye: detectedFace.leftEye,
-      rightEye: detectedFace.rightEye,
-    });
-
-    const layout = getPassportLayoutFromSize(size);
-    const professionalComposition = calculateAutoComposition({
-      imageWidth: img.naturalWidth,
-      imageHeight: img.naturalHeight,
-      canvasWidth: layout.canvasWidth,
-      canvasHeight: layout.canvasHeight,
-      face: {
-        forehead: {
-          x: detectedFace.forehead.x * img.naturalWidth,
-          y: detectedFace.forehead.y * img.naturalHeight,
-        },
-        chin: {
-          x: detectedFace.chin.x * img.naturalWidth,
-          y: detectedFace.chin.y * img.naturalHeight,
-        },
-        leftEye: {
-          x: detectedFace.leftEye.x * img.naturalWidth,
-          y: detectedFace.leftEye.y * img.naturalHeight,
-        },
-        rightEye: {
-          x: detectedFace.rightEye.x * img.naturalWidth,
-          y: detectedFace.rightEye.y * img.naturalHeight,
-        },
-      },
-      rules: layout.rules,
-    });
-
-    const newComposition = {
-      scale: professionalComposition.scale,
-      offsetX: professionalComposition.offsetX,
-      offsetY: professionalComposition.offsetY,
-    };
-
-    setComposition(newComposition);
-    setZoom(1);
-  } catch (err) {
-    console.error(err);
-  }
-}, [size]);
 
 useEffect(() => {
   async function updatePreview() {
@@ -278,7 +179,6 @@ useEffect(() => {
       );
 
       setPreviewUrl(preview);
-      await runFaceDetection(preview);
     } catch (err) {
       console.error(err);
     }
@@ -294,7 +194,6 @@ useEffect(() => {
   brightness,
   contrast,
   saturation,
-  runFaceDetection,
 ]);
 
 async function handleRemoveBackground() {
@@ -406,9 +305,11 @@ setPreviewUrl(url);
   {/* Right Sidebar */}
  <div className="min-w-0 xl:sticky xl:top-6 xl:self-start">
   <RightSidebar
-image={previewImage}
-  composition={composition}
-  face={face}
+sourceImage={transparentImage ?? image}
+  cropArea={croppedAreaPixels}
+  rotation={rotation}
+  zoom={zoom}
+  size={size}
   backgroundColor={backgroundColor}
   sizeName={currentSize.name}
   brightness={brightness}
