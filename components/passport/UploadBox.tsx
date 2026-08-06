@@ -88,6 +88,7 @@ export default function UploadBox({ onSelect }: UploadBoxProps) {
         ref={inputRef}
         hidden
         type="file"
+        capture="environment"
         accept="image/jpeg,image/jpg,image/png,image/webp"
         onChange={(e) => {
           const file = e.target.files?.[0];

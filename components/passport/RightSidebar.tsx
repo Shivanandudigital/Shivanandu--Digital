@@ -1,75 +1,70 @@
 "use client";
 
-import PreviewPanel from "./PreviewPanel";
+import React from "react";
 
-type CropArea = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-type Props = {
-  sourceImage: string | HTMLImageElement | null;
-  cropArea?: CropArea | null;
-  rotation?: number;
-  zoom?: number;
-  size?: string;
-  backgroundColor: string;
-  sizeName: string;
-  brightness: number;
-  contrast: number;
-  saturation: number;
-};
+interface RightSidebarProps {
+  previewImage?: string | null;
+  passportSizeName?: string;
+  bgColorHex?: string;
+  [key: string]: any;
+}
 
 export default function RightSidebar({
-  sourceImage,
-  cropArea,
-  rotation = 0,
-  zoom = 1,
-  size = "35x45",
-  backgroundColor,
-  sizeName,
-  brightness,
-  contrast,
-  saturation,
-}: Props) {
+  previewImage,
+  passportSizeName = "India Passport (35×45 mm)",
+  bgColorHex = "#FFFFFF",
+}: RightSidebarProps) {
+  const handleDownload = (format: string) => {
+    if (!previewImage) return;
+    const link = document.createElement("a");
+    link.href = previewImage;
+    link.download = `passport-photo.${format}`;
+    link.click();
+  };
+
   return (
-    <div className="space-y-6">
-      <PreviewPanel
-        sourceImage={sourceImage}
-        cropArea={cropArea}
-        rotation={rotation}
-        zoom={zoom}
-        size={size}
-        backgroundColor={backgroundColor}
-      />
+    <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-lg">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-sm font-extrabold text-slate-800">Output Summary</h3>
+        <p className="text-xs text-slate-500">Size: <span className="font-semibold text-slate-700">{passportSizeName}</span></p>
+        <p className="text-xs text-slate-500">Background: <span className="font-semibold text-slate-700">{bgColorHex}</span></p>
+      </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-        <h3 className="text-lg font-bold text-gray-900">Output Summary</h3>
+      <hr className="border-slate-100" />
 
-        <div className="mt-4 space-y-3 text-sm text-gray-600">
-          <div className="flex items-center justify-between gap-4">
-            <span>Passport size</span>
-            <span className="font-medium text-gray-800">{sizeName}</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span>Background</span>
-            <span className="font-medium text-gray-800">{backgroundColor}</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span>Brightness</span>
-            <span className="font-medium text-gray-800">{brightness}%</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span>Contrast</span>
-            <span className="font-medium text-gray-800">{contrast}%</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span>Saturation</span>
-            <span className="font-medium text-gray-800">{saturation}%</span>
-          </div>
-        </div>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        Download & Print Options
+      </h3>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <button
+          onClick={() => handleDownload("jpg")}
+          disabled={!previewImage}
+          className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-xs font-bold text-white shadow-md hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50"
+        >
+          📷 Download JPG
+        </button>
+        <button
+          onClick={() => handleDownload("png")}
+          disabled={!previewImage}
+          className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-bold text-white shadow-md hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-50"
+        >
+          🖼️ Download PNG
+        </button>
+        <button
+          onClick={() => handleDownload("pdf")}
+          disabled={!previewImage}
+          className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-xs font-bold text-white shadow-md hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50"
+        >
+          📄 Download PDF
+        </button>
+        <button
+          onClick={() => window.print()}
+          disabled={!previewImage}
+          className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-md hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-50"
+        >
+          🖨️ Print Sheet
+        </button>
       </div>
     </div>
   );

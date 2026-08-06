@@ -1,332 +1,317 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Area } from "react-easy-crop";
+
+import React, { useState, useEffect, useCallback } from "react";
 import CropCanvas from "./CropCanvas";
-import EditorToolbar from "./EditorToolbar";
-import EditorHeader from "./EditorHeader";
-import DownloadPanel from "./DownloadPanel";
-import RightSidebar from "./RightSidebar";
-import TopToolbar from "./TopToolbar";
-import LeftSidebar from "./LeftSidebar";
-
-import { cropImage } from "@/lib/cropImage";
-import { getPassportSize } from "@/lib/passportSizes";
-import { downloadFile } from "@/lib/downloadImage";
-import { downloadPdf } from "@/lib/downloadPdf";
-import { createPrintSheet } from "@/lib/createPrintSheet";
-import { removeBackground } from "@imgly/background-removal";
 import { renderFinalPassportCanvas } from "@/lib/composePassport";
+import { detectAutomaticPassportCrop } from "@/lib/autoPassportCrop";
 
-
-
-type Props = {
+interface ImageCropperProps {
   image: string;
   onChooseAnotherPhoto: () => void;
-};
+}
 
 export default function ImageCropper({
   image,
   onChooseAnotherPhoto,
-}: Props) {
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
- const [size, setSize] = useState("35x45");
+}: ImageCropperProps) {
+  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState<number>(1.0);
+  const [rotation, setRotation] = useState<number>(0);
+  const [bgColor, setBgColor] = useState<string>("#FFFFFF");
+  const [passportSize, setPassportSize] = useState<string>("in_passport");
+  const [brightness, setBrightness] = useState<number>(100);
+  const [contrast, setContrast] = useState<number>(100);
+  const [saturation, setSaturation] = useState<number>(100);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-const [backgroundColor, setBackgroundColor] =
-  useState("#ffffff");
-  const [croppedAreaPixels, setCroppedAreaPixels] =
-    useState<Area | null>(null);
+  // অটো-ক্রপ ফাংশন
+  const handleAutoFrame = useCallback(() => {
+    if (!image) return;
+    const img = new Image();
+    img.src = image;
+    img.onload = () => {
+      const detectedCrop = detectAutomaticPassportCrop(img.width, img.height);
+      setCrop({ x: detectedCrop.cropX, y: detectedCrop.cropY });
+      setZoom(detectedCrop.zoom || 1.0);
+      setRotation(0);
+      setCroppedAreaPixels({
+        x: detectedCrop.cropX,
+        y: detectedCrop.cropY,
+        width: detectedCrop.cropWidth,
+        height: detectedCrop.cropHeight,
+      });
+    };
+  }, [image]);
 
-  const [previewUrl, setPreviewUrl] =
-    useState<string>();
-    const [transparentImage, setTransparentImage] =
-  useState<string>();
-    const [loading, setLoading] =
-  useState(false);
-const [brightness, setBrightness] = useState(100);
-const [contrast, setContrast] = useState(100);
-const [saturation, setSaturation] = useState(100);
-  const currentSize = useMemo(
-    () => getPassportSize(size),
-    [size]
-  );
+  useEffect(() => {
+    handleAutoFrame();
+  }, [handleAutoFrame]);
 
-  const onCropComplete = useCallback(
-    async (_: Area, croppedPixels: Area) => {
+  const onCropComplete = useCallback((_: any, croppedPixels: any) => {
+    setCroppedAreaPixels(croppedPixels);
+  }, []);
 
-      setCroppedAreaPixels(croppedPixels);
+  // ফাইনাল ক্যানভাস রেন্ডার
+  useEffect(() => {
+    let isMounted = true;
+
+    async function generatePreview() {
+      if (!image) return;
 
       try {
- const preview = await cropImage(
-  transparentImage ?? image,
-  croppedPixels,
-  rotation,
-  "image/jpeg",
-  0.95,
-  backgroundColor
-);
+        const finalUrl = await renderFinalPassportCanvas({
+          imageSrc: image,
+          crop: croppedAreaPixels || { x: 0, y: 0, width: 413, height: 531 },
+          zoom,
+          rotation,
+          backgroundColor: bgColor,
+          targetWidth: 413,
+          targetHeight: 531,
+        });
 
-        setPreviewUrl(preview);
+        if (isMounted) {
+          setPreviewImage(finalUrl);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Preview generation failed:", err);
       }
-    },
-    [image, rotation, backgroundColor, transparentImage]
-  );
-const createProfessionalDownload = useCallback(
-  async (mimeType: "image/jpeg" | "image/png") => {
-    if (!croppedAreaPixels) {
-      throw new Error("Please adjust the crop area before downloading.");
     }
 
-    const canvas = document.createElement("canvas");
-    const renderedCanvas = await renderFinalPassportCanvas({
-      canvas,
-      sourceImage: transparentImage ?? image,
-      size,
-      backgroundColor,
-      cropArea: {
-        x: croppedAreaPixels.x,
-        y: croppedAreaPixels.y,
-        width: croppedAreaPixels.width,
-        height: croppedAreaPixels.height,
-      },
-      rotation,
-      zoom,
-      transparentBackground: backgroundColor === "transparent",
-      adjustments: {
-        brightness,
-        contrast,
-        saturation,
-      },
-      mimeType,
-      quality: mimeType === "image/jpeg" ? 0.95 : 1,
-    });
+    generatePreview();
 
-    return renderedCanvas.toDataURL(
-      mimeType,
-      mimeType === "image/jpeg" ? 0.95 : 1
-    );
-  },
-  [backgroundColor, brightness, contrast, croppedAreaPixels, image, rotation, saturation, size, transparentImage, zoom]
-);
+    return () => {
+      isMounted = false;
+    };
+  }, [image, croppedAreaPixels, zoom, rotation, bgColor]);
 
-async function downloadJPG() {
-  try {
-    const jpg = await createProfessionalDownload("image/jpeg");
-    downloadFile(jpg, "passport-photo.jpg");
-  } catch (err) {
-    console.error(err);
-    alert("Passport JPG তৈরি করা যায়নি।");
-  }
-}
-
-async function downloadPNG() {
-  try {
-    const png = await createProfessionalDownload("image/png");
-    downloadFile(png, "passport-photo.png");
-  } catch (err) {
-    console.error(err);
-    alert("Passport PNG তৈরি করা যায়নি।");
-  }
-}
-
-async function downloadPDF() {
-  try {
-    const jpg = await createProfessionalDownload("image/jpeg");
-    downloadPdf(jpg);
-  } catch (err) {
-    console.error(err);
-    alert("Passport PDF তৈরি করা যায়নি।");
-  }
-}
-
-async function downloadPrintSheet() {
-  try {
-    const passportPhoto = await createProfessionalDownload("image/jpeg");
-    const sheet = await createPrintSheet(passportPhoto);
-
-    downloadFile(
-      sheet,
-      "passport-print-sheet.jpg"
-    );
-  } catch (err) {
-    console.error(err);
-    alert("Failed to create print sheet.");
-  }
-}
-
-function handleAutoZoom() {
-  setZoom(1);
-}
-
-useEffect(() => {
-  async function updatePreview() {
-    if (!croppedAreaPixels) return;
-
-    try {
-      const preview = await cropImage(
-        transparentImage ?? image,
-        croppedAreaPixels,
-        rotation,
-        "image/jpeg",
-        0.95,
-        backgroundColor,
-        brightness,
-        contrast,
-        saturation
-      );
-
-      setPreviewUrl(preview);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  void updatePreview();
-}, [
-  backgroundColor,
-  transparentImage,
-  croppedAreaPixels,
-  rotation,
-  image,
-  brightness,
-  contrast,
-  saturation,
-]);
-
-async function handleRemoveBackground() {
-  if (!previewUrl) return;
-
-  try {
-    setLoading(true);
-
-    const response = await fetch(previewUrl);
-    const blob = await response.blob();
-
-    const output = await removeBackground(blob);
-
-   const url = URL.createObjectURL(output);
-
-setTransparentImage(url);
-setPreviewUrl(url);
-  } catch (err) {
-    console.error(err);
-    alert("Background removal failed.");
-  } finally {
-    setLoading(false);
-  }
-}
+  const handleDownload = (format: string) => {
+    if (!previewImage) return;
+    const link = document.createElement("a");
+    link.href = previewImage;
+    link.download = `passport-photo.${format}`;
+    link.click();
+  };
 
   return (
-    <div className="space-y-8">
-
-<EditorHeader
-  onChoosePhoto={onChooseAnotherPhoto}
-/>
-
-<TopToolbar
-  size={size}
-  onSizeChange={setSize}
-  backgroundColor={backgroundColor}
-  onBackgroundChange={setBackgroundColor}
-  loading={loading}
-  onRemoveBackground={handleRemoveBackground}
-/>
-
-  
-
-     <div className="grid min-w-0 gap-6 xl:grid-cols-4 xl:gap-8">
-
-  {/* Left Sidebar */}
- <div className="min-w-0 xl:sticky xl:top-6 xl:self-start">
-  
-  <LeftSidebar
-  zoom={zoom}
-  rotation={rotation}
-
-  brightness={brightness}
-  contrast={contrast}
-  saturation={saturation}
-
-  onZoomChange={setZoom}
-  onRotationChange={setRotation}
-
-  onBrightnessChange={setBrightness}
-  onContrastChange={setContrast}
-  onSaturationChange={setSaturation}
-/>
-</div>
-
-  {/* Crop Area */}
- <div className="min-w-0 xl:col-span-2">
-  <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-
-   <div className="flex flex-col gap-3 border-b border-gray-200 bg-gray-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-      <div>
-        <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
-  Simple Editor
-</h2>
-
-        <p className="mt-1 text-sm text-gray-500">
-  Adjust the frame, background, and final preview before you download.
-</p>
+    <div className="flex flex-col gap-6">
+      {/* Top Action Header */}
+      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Passport Photo Maker</h1>
+          <p className="text-xs text-gray-500">Upload a mobile photo and review the automatically prepared frame</p>
+        </div>
+        <button
+          onClick={onChooseAnotherPhoto}
+          className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-red-700 transition-colors"
+        >
+          Choose Another Photo
+        </button>
       </div>
 
-    </div>
+      {/* Main Options Box */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+        {/* Passport Size */}
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+            PASSPORT / VISA SIZE
+          </label>
+          <select
+            value={passportSize}
+            onChange={(e) => setPassportSize(e.target.value)}
+            className="w-full rounded-xl border border-gray-300 bg-gray-50 p-2.5 text-sm font-medium text-gray-800"
+          >
+            <option value="in_passport">🇮🇳 India Passport / Visa (35×45 mm)</option>
+            <option value="us_passport">🇺🇸 US Passport (2×2 inch)</option>
+            <option value="uk_passport">🇬🇧 UK Passport (35×45 mm)</option>
+          </select>
+        </div>
 
-    <div className="p-3 sm:p-6">
-      <CropCanvas
-        image={transparentImage ?? image}
-        crop={crop}
-        zoom={zoom}
-        rotation={rotation}
-        aspect={currentSize.aspect}
-        onCropChange={setCrop}
-        onZoomChange={setZoom}
-        onCropComplete={onCropComplete}
-      />
-    </div>
+        {/* Background Color Palette */}
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+            BACKGROUND COLOR
+          </label>
+          <div className="flex items-center gap-3">
+            {["#FFFFFF", "#60A5FA", "#EF4444", "#E5E7EB", "#1E293B"].map((hex) => (
+              <button
+                key={hex}
+                type="button"
+                onClick={() => setBgColor(hex)}
+                className={`h-9 w-9 rounded-full border-2 transition-transform hover:scale-110 ${
+                  bgColor === hex ? "border-blue-600 scale-105 ring-2 ring-blue-300" : "border-gray-300"
+                }`}
+                style={{ backgroundColor: hex }}
+              />
+            ))}
+          </div>
+        </div>
 
-<EditorToolbar
-  zoom={zoom}
-  rotation={rotation}
-  onZoomIn={() => setZoom((z) => Math.min(z + 0.1, 3))}
-  onZoomOut={() => setZoom((z) => Math.max(z - 0.1, 1))}
-  onRotateLeft={() => setRotation((r) => r - 90)}
-  onRotateRight={() => setRotation((r) => r + 90)}
-  onAutoZoom={handleAutoZoom}
-/>
+        <hr className="border-gray-100" />
 
-  </div>
-</div>
+        {/* Editor Adjustments */}
+        <div className="space-y-4">
+          <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
+            EDITOR CONTROLS
+          </label>
+          
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+              <span>Zoom</span>
+              <span>{zoom.toFixed(1)}x</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={2.5}
+              step={0.1}
+              value={zoom}
+              onChange={(e) => setZoom(parseFloat(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
+            />
+          </div>
 
-  {/* Right Sidebar */}
- <div className="min-w-0 xl:sticky xl:top-6 xl:self-start">
-  <RightSidebar
-sourceImage={transparentImage ?? image}
-  cropArea={croppedAreaPixels}
-  rotation={rotation}
-  zoom={zoom}
-  size={size}
-  backgroundColor={backgroundColor}
-  sizeName={currentSize.name}
-  brightness={brightness}
-  contrast={contrast}
-  saturation={saturation}
-/>
-</div>
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+              <span>Rotation</span>
+              <span>{rotation}°</span>
+            </div>
+            <input
+              type="range"
+              min={-45}
+              max={45}
+              step={1}
+              value={rotation}
+              onChange={(e) => setRotation(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
+            />
+          </div>
 
-</div>
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+              <span>Brightness ({brightness}%)</span>
+            </div>
+            <input
+              type="range"
+              min={50}
+              max={150}
+              value={brightness}
+              onChange={(e) => setBrightness(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
+            />
+          </div>
 
-<DownloadPanel
-  onDownloadJPG={downloadJPG}
-  onDownloadPNG={downloadPNG}
-  onDownloadPDF={downloadPDF}
-  onPrint={downloadPrintSheet}
-/>
+          <div>
+            <div className="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+              <span>Contrast ({contrast}%)</span>
+            </div>
+            <input
+              type="range"
+              min={50}
+              max={150}
+              value={contrast}
+              onChange={(e) => setContrast(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer accent-blue-600"
+            />
+          </div>
+        </div>
+      </div>
 
+      {/* Frame Canvas Section */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <h3 className="text-sm font-bold text-gray-700">Automatic Passport Frame</h3>
+        <CropCanvas
+          image={image}
+          crop={crop}
+          zoom={zoom}
+          rotation={rotation}
+          onCropChange={setCrop}
+          onZoomChange={setZoom}
+          onCropComplete={onCropComplete}
+        />
+        <div className="flex flex-wrap gap-2 pt-2">
+          <button
+            onClick={() => setZoom((z) => Math.min(z + 0.1, 2.5))}
+            className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+          >
+            + Zoom
+          </button>
+          <button
+            onClick={() => setZoom((z) => Math.max(z - 0.1, 1))}
+            className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+          >
+            - Zoom
+          </button>
+          <button
+            onClick={handleAutoFrame}
+            className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+          >
+            Auto Frame
+          </button>
+          <button
+            onClick={() => setRotation((r) => r - 90)}
+            className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+          >
+            ↺ Rotate
+          </button>
+          <button
+            onClick={() => setRotation((r) => r + 90)}
+            className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+          >
+            ↻ Rotate
+          </button>
+        </div>
+      </div>
+
+      {/* Final Preview */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-bold text-gray-700">Final Preview</h3>
+        <div className="flex justify-center bg-gray-50 p-6 rounded-xl">
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt="Final Passport Preview"
+              className="h-[220px] w-[170px] border border-gray-300 shadow-md rounded object-contain bg-white"
+            />
+          ) : (
+            <div className="text-xs text-gray-400">Generating preview...</div>
+          )}
+        </div>
+      </div>
+
+      {/* Download Bar */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
+        <div className="text-xs text-gray-600">
+          <p><strong>Size:</strong> India Passport (35×45 mm)</p>
+          <p><strong>Background:</strong> {bgColor}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <button
+            onClick={() => handleDownload("jpg")}
+            className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-blue-700"
+          >
+            Download JPG
+          </button>
+          <button
+            onClick={() => handleDownload("png")}
+            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-indigo-700"
+          >
+            Download PNG
+          </button>
+          <button
+            onClick={() => handleDownload("pdf")}
+            className="rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-red-700"
+          >
+            Download PDF
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-emerald-700"
+          >
+            Print Sheet
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -91,7 +91,7 @@ export default function PassportPhotoMaker() {
       setImage(transparentImage);
       setProcessingProgress(100);
       setProcessingMessage(
-        "Background removed successfully. Review the preview before downloading."
+        "Background removed. Preparing the passport frame."
       );
     } catch (error) {
       console.error(
@@ -171,7 +171,8 @@ export default function PassportPhotoMaker() {
           </p>
 
           <p className="mt-5 max-w-md text-xs leading-5 text-gray-500">
-            The first pass may take a little longer while the image is prepared.
+            প্রথমবার AI model download হওয়ার কারণে
+            processing-এ কিছুটা বেশি সময় লাগতে পারে।
           </p>
         </div>
       ) : null}
@@ -183,8 +184,14 @@ export default function PassportPhotoMaker() {
               {backgroundError}
             </div>
           ) : (
-            <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">
-              Background removed successfully. Review the preview before downloading.
+            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 sm:items-center">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green-600 text-sm text-white">
+                ✓
+              </span>
+
+              <span>
+                Background removed successfully. Review the automatic frame before downloading.
+              </span>
             </div>
           )}
 

@@ -52,7 +52,7 @@ export default function EditorToolbar({
   onClick={onAutoZoom}
   className="col-span-2 min-h-10 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:col-span-1"
 >
-  Auto Zoom
+  Auto Frame
 </button>
           <button
             onClick={onRotateLeft}
@@ -69,7 +69,7 @@ export default function EditorToolbar({
           </button>
 
           <span className="col-span-2 rounded-full bg-green-100 px-3 py-2 text-center text-xs font-semibold text-green-700 sm:col-span-1">
-            Live Editing
+            Manual adjustment
           </span>
 
         </div>

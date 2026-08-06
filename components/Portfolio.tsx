@@ -44,12 +44,12 @@ export default function Portfolio() {
 
           <div className="p-6">
             <h3 className="text-xl font-bold mb-3">
-              Passport Photo Maker
+              Passport Photo Editor
             </h3>
 
             <p className="text-gray-600">
-              An AI-powered passport photo editor with background removal, ICAO
-              checks and professional download options.
+              A simple photo editor for passport and visa preparation with
+              background removal, crop adjustments and export-ready previews.
             </p>
           </div>
         </div>

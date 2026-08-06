@@ -1,30 +1,27 @@
 "use client";
 
-type Props = {
-  onChoosePhoto: () => void;
-};
+import React from "react";
 
-export default function EditorHeader({
-  onChoosePhoto,
-}: Props) {
+interface EditorHeaderProps {
+  onChooseAnotherPhoto?: () => void;
+  [key: string]: any;
+}
+
+export default function EditorHeader({ onChooseAnotherPhoto }: EditorHeaderProps) {
   return (
-    <div className="mb-6 flex flex-col gap-4 rounded-2xl border bg-white p-4 shadow-sm sm:p-6 md:flex-row md:items-center md:justify-between">
+    <div className="flex items-center justify-between border-b border-gray-200 pb-4">
       <div>
-        <h2 className="text-2xl font-bold leading-tight sm:text-3xl">
-          Passport Photo Editor
-        </h2>
-
-        <p className="mt-1 text-sm text-gray-500 sm:text-base">
-          Adjust the crop, background, and final framing before download.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Passport Photo Maker</h1>
+        <p className="text-sm text-gray-500">Professional Digital Tool</p>
       </div>
-
-      <button
-        onClick={onChoosePhoto}
-        className="w-full rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700 md:w-auto"
-      >
-        Choose Another Photo
-      </button>
+      {onChooseAnotherPhoto && (
+        <button
+          onClick={onChooseAnotherPhoto}
+          className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition-colors"
+        >
+          Choose Another Photo
+        </button>
+      )}
     </div>
   );
 }
