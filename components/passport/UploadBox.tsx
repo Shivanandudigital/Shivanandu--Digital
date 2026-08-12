@@ -7,7 +7,8 @@ type UploadBoxProps = {
 };
 
 export default function UploadBox({ onSelect }: UploadBoxProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [dragging, setDragging] = useState(false);
 
@@ -32,10 +33,20 @@ export default function UploadBox({ onSelect }: UploadBoxProps) {
     onSelect(file);
   }
 
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      validateAndSelect(file);
+    }
+
+    // Allows the same photo to be selected again after returning to upload.
+    event.target.value = "";
+  }
+
   return (
     <>
       <div
-        onClick={() => inputRef.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
           setDragging(true);
@@ -51,7 +62,7 @@ export default function UploadBox({ onSelect }: UploadBoxProps) {
             validateAndSelect(file);
           }
         }}
-        className={`cursor-pointer rounded-3xl border-2 border-dashed p-12 transition-all duration-300 text-center ${
+        className={`rounded-3xl border-2 border-dashed p-6 text-center transition-all duration-300 sm:p-12 ${
           dragging
             ? "border-blue-600 bg-blue-50"
             : "border-blue-300 hover:border-blue-500 hover:bg-blue-50"
@@ -64,16 +75,30 @@ export default function UploadBox({ onSelect }: UploadBoxProps) {
         </h2>
 
         <p className="mt-3 text-gray-600">
-          Drag & Drop your image here
+          Take a new photo or choose one from your device
         </p>
 
-        <p className="mt-2 text-sm text-gray-500">
-          or click to browse
-        </p>
+        <div className="mx-auto mt-8 grid max-w-md gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+          >
+            📷 Take Photo
+          </button>
 
-        <div className="mt-8 inline-flex rounded-xl bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-700 transition">
-          Choose Photo
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            className="rounded-xl border border-blue-600 bg-white px-6 py-3 font-semibold text-blue-700 transition hover:bg-blue-50"
+          >
+            🖼️ Choose from Gallery
+          </button>
         </div>
+
+        <p className="mt-5 hidden text-sm text-gray-500 sm:block">
+          You can also drag and drop an image here
+        </p>
 
         <div className="mt-6 text-sm text-gray-500">
           Supported: JPG • PNG • WEBP
@@ -85,18 +110,20 @@ export default function UploadBox({ onSelect }: UploadBoxProps) {
       </div>
 
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         hidden
         type="file"
         capture="environment"
         accept="image/jpeg,image/jpg,image/png,image/webp"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
+        onChange={handleInputChange}
+      />
 
-          if (file) {
-            validateAndSelect(file);
-          }
-        }}
+      <input
+        ref={galleryInputRef}
+        hidden
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        onChange={handleInputChange}
       />
     </>
   );
