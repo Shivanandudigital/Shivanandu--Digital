@@ -11,6 +11,14 @@ export type EnhancementSettings = {
   highlights: number;
   shadows: number;
   noiseReduction: number;
+  temperature: number;
+  tint: number;
+};
+
+export type AIAnalysis = {
+  settings: EnhancementSettings;
+  summary: string;
+  corrections: string[];
 };
 
 export const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
@@ -26,6 +34,8 @@ export const initialSettings: EnhancementSettings = {
   highlights: 0,
   shadows: 0,
   noiseReduction: 0,
+  temperature: 0,
+  tint: 0,
 };
 
 export const presetSettings: Record<EnhancementPreset, EnhancementSettings> = {
@@ -38,6 +48,8 @@ export const presetSettings: Record<EnhancementPreset, EnhancementSettings> = {
     highlights: 4,
     shadows: -4,
     noiseReduction: 6,
+    temperature: 0,
+    tint: 0,
   },
   portrait: {
     brightness: 104,
@@ -48,6 +60,8 @@ export const presetSettings: Record<EnhancementPreset, EnhancementSettings> = {
     highlights: 8,
     shadows: -8,
     noiseReduction: 8,
+    temperature: 2,
+    tint: 0,
   },
   document: {
     brightness: 101,
@@ -58,6 +72,8 @@ export const presetSettings: Record<EnhancementPreset, EnhancementSettings> = {
     highlights: 2,
     shadows: -2,
     noiseReduction: 4,
+    temperature: 0,
+    tint: 0,
   },
   vivid: {
     brightness: 103,
@@ -68,6 +84,8 @@ export const presetSettings: Record<EnhancementPreset, EnhancementSettings> = {
     highlights: 6,
     shadows: -6,
     noiseReduction: 6,
+    temperature: 1,
+    tint: 0,
   },
 };
 
@@ -84,7 +102,9 @@ function isNeutralSettings(settings: EnhancementSettings) {
     settings.clarity === 0 &&
     settings.highlights === 0 &&
     settings.shadows === 0 &&
-    settings.noiseReduction === 0
+    settings.noiseReduction === 0 &&
+    settings.temperature === 0 &&
+    settings.tint === 0
   );
 }
 
@@ -310,6 +330,71 @@ function createOrientedCanvas(image: HTMLImageElement, orientation: number) {
   return canvas;
 }
 
+export function analyzeImageForAI(image: HTMLImageElement, orientation: number): AIAnalysis {
+  const source = createOrientedCanvas(image, orientation);
+  const sample = document.createElement("canvas");
+  const ratio = Math.min(320 / source.width, 320 / source.height, 1);
+  sample.width = Math.max(1, Math.round(source.width * ratio));
+  sample.height = Math.max(1, Math.round(source.height * ratio));
+  const context = sample.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("AI analysis could not read this image.");
+  context.drawImage(source, 0, 0, sample.width, sample.height);
+  const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+  const histogram = new Uint32Array(256);
+  let red = 0, green = 0, blue = 0, luminanceSum = 0, luminanceSquared = 0, count = 0, edgeEnergy = 0, previousLuminance = 0;
+
+  for (let index = 0; index < pixels.length; index += 4) {
+    if (pixels[index + 3] < 16) continue;
+    const r = pixels[index], g = pixels[index + 1], b = pixels[index + 2];
+    const luminance = Math.round(r * 0.2126 + g * 0.7152 + b * 0.0722);
+    histogram[luminance] += 1;
+    red += r; green += g; blue += b;
+    luminanceSum += luminance;
+    luminanceSquared += luminance * luminance;
+    if (count > 0) edgeEnergy += Math.abs(luminance - previousLuminance);
+    previousLuminance = luminance;
+    count += 1;
+  }
+  if (!count) throw new Error("AI analysis found no visible pixels in this image.");
+
+  const percentile = (target: number) => {
+    let total = 0;
+    for (let value = 0; value < histogram.length; value += 1) {
+      total += histogram[value];
+      if (total >= count * target) return value;
+    }
+    return 255;
+  };
+  const low = percentile(0.05), high = percentile(0.95), mean = luminanceSum / count;
+  const deviation = Math.sqrt(Math.max(0, luminanceSquared / count - mean * mean));
+  const warmthBias = red / count - blue / count;
+  const greenBias = green / count - (red / count + blue / count) / 2;
+  const dynamicRange = high - low;
+  const detail = edgeEnergy / Math.max(1, count - 1);
+  const brightness = clamp(Math.round(100 + (126 - mean) / 8), 88, 114);
+  const contrast = clamp(Math.round(100 + (150 - dynamicRange) / 9 + (42 - deviation) / 8), 96, 116);
+  const temperature = clamp(Math.round(-warmthBias / 7), -12, 12);
+  const tint = clamp(Math.round(-greenBias / 5), -10, 10);
+  const noiseReduction = clamp(Math.round(4 + Math.max(0, 10 - detail) / 2), 3, 12);
+  const sharpness = clamp(Math.round(8 + Math.max(0, 11 - detail) / 2), 7, 15);
+  const highlights = high > 238 ? -8 : high < 205 ? 4 : 0;
+  const shadows = low < 16 ? 10 : low > 48 ? -3 : 5;
+  const saturation = clamp(Math.round(102 - Math.abs(warmthBias) / 18 - Math.abs(greenBias) / 20), 96, 105);
+  const corrections: string[] = [];
+  if (brightness > 102) corrections.push("Low light recovery");
+  if (brightness < 98) corrections.push("Exposure protection");
+  if (contrast > 103) corrections.push("Dynamic contrast");
+  if (Math.abs(temperature) >= 3 || Math.abs(tint) >= 3) corrections.push("AI white balance");
+  if (shadows > 3) corrections.push("Shadow detail recovery");
+  corrections.push("Detail and noise optimisation");
+
+  return {
+    settings: { brightness, contrast, saturation, sharpness, clarity: clamp(Math.round(sharpness * 0.8), 6, 12), highlights, shadows, noiseReduction, temperature, tint },
+    summary: mean < 92 ? "AI detected a dark photo and recovered natural detail." : mean > 178 ? "AI protected bright areas and restored balanced contrast." : "AI balanced colour, light and fine detail for a natural result.",
+    corrections,
+  };
+}
+
 function applyBrightnessContrast(data: Uint8ClampedArray, settings: EnhancementSettings) {
   if (settings.brightness === 100 && settings.contrast === 100) {
     return;
@@ -365,6 +450,18 @@ function applySaturation(data: Uint8ClampedArray, settings: EnhancementSettings)
     data[index + 1] = clamp(saturatedGreen, 0, 255);
     data[index + 2] = clamp(saturatedBlue, 0, 255);
     data[index + 3] = alpha;
+  }
+}
+
+function applyWhiteBalance(data: Uint8ClampedArray, settings: EnhancementSettings) {
+  if (settings.temperature === 0 && settings.tint === 0) return;
+  const warmth = settings.temperature * 1.15;
+  const tint = settings.tint * 0.85;
+  for (let index = 0; index < data.length; index += 4) {
+    if (data[index + 3] === 0) continue;
+    data[index] = clamp(data[index] + warmth + tint * 0.35, 0, 255);
+    data[index + 1] = clamp(data[index + 1] - tint * 0.65, 0, 255);
+    data[index + 2] = clamp(data[index + 2] - warmth + tint * 0.35, 0, 255);
   }
 }
 
@@ -503,6 +600,7 @@ export async function renderEnhancedCanvas(image: HTMLImageElement, settings: En
 
   if (!isNeutralSettings(settings)) {
     applyBrightnessContrast(imageData.data, settings);
+    applyWhiteBalance(imageData.data, settings);
     applySaturation(imageData.data, settings);
     applyHighlightsShadows(imageData.data, settings);
     applyClarity(imageData.data, width, height, settings);

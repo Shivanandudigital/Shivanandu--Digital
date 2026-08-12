@@ -12,9 +12,11 @@ import {
 import {
   EnhancementPreset,
   EnhancementSettings,
+  AIAnalysis,
   OutputFormat,
   OutputScale,
   MAX_FILE_SIZE_BYTES,
+  analyzeImageForAI,
   estimateOutputSizeBytes,
   formatBytes,
   getExifOrientation,
@@ -57,6 +59,8 @@ export default function PhotoEnhancer() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const renderJobIdRef = useRef(0);
   const loadedImageRef = useRef<LoadedImage | null>(null);
@@ -139,6 +143,7 @@ export default function PhotoEnhancer() {
       setOutputFormat("jpeg");
       setJpegQuality(92);
       setHistory([]);
+      setAiAnalysis(null);
       setPreviewUrl(objectUrl);
     } catch (loadError) {
       URL.revokeObjectURL(objectUrl);
@@ -220,7 +225,7 @@ export default function PhotoEnhancer() {
       const nextSettings = { ...current, [key]: value };
       setHistory((currentHistory) => {
         const limitHistory = currentHistory.length > 10 ? currentHistory.slice(1) : currentHistory;
-        return [...limitHistory, { settings: nextSettings, preset: "custom" }];
+        return [...limitHistory, { settings: current, preset }];
       });
       return nextSettings;
     });
@@ -228,26 +233,28 @@ export default function PhotoEnhancer() {
   }
 
   function applyPreset(nextPreset: EnhancementPreset) {
+    setHistory((currentHistory) => [...currentHistory.slice(-9), { settings, preset }]);
     setPreset(nextPreset);
     setSettings(presetSettings[nextPreset]);
-    setHistory((currentHistory) => [...currentHistory, { settings: presetSettings[nextPreset], preset: nextPreset }]);
+    setAiAnalysis(null);
   }
 
-  function applyAutoEnhance() {
-    const autoSettings: EnhancementSettings = {
-      brightness: 104,
-      contrast: 108,
-      saturation: 103,
-      sharpness: 10,
-      clarity: 12,
-      highlights: 6,
-      shadows: -4,
-      noiseReduction: 6,
-    };
-
-    setPreset("custom");
-    setSettings(autoSettings);
-    setHistory((currentHistory) => [...currentHistory, { settings: autoSettings, preset: "custom" }]);
+  async function applyAutoEnhance() {
+    if (!loadedImage || isAnalyzing) return;
+    setIsAnalyzing(true);
+    setError(null);
+    try {
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 40));
+      const analysis = analyzeImageForAI(loadedImage.decodedImage, loadedImage.orientation);
+      setHistory((currentHistory) => [...currentHistory.slice(-9), { settings, preset }]);
+      setPreset("custom");
+      setSettings(analysis.settings);
+      setAiAnalysis(analysis);
+    } catch (analysisError) {
+      setError(analysisError instanceof Error ? analysisError.message : "AI enhancement failed.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   }
 
   function undoLastChange() {
@@ -265,6 +272,7 @@ export default function PhotoEnhancer() {
     setSettings(initialSettings);
     setPreset("custom");
     setHistory([]);
+    setAiAnalysis(null);
   }
 
   async function downloadEnhancedPhoto() {
@@ -308,7 +316,7 @@ export default function PhotoEnhancer() {
           </span>
           <span className="mt-5 text-xl font-bold text-slate-800">Upload a photo to enhance</span>
           <span className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
-            Smart Auto Enhance works entirely in your browser using Canvas APIs. It preserves the original character of your image while improving brightness, contrast, clarity, and tone.
+            AI analyzes every photo separately, corrects exposure and white balance, restores detail, reduces noise, and keeps the result natural.
           </span>
           <span className="mt-6 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white">Choose photo</span>
           <span className="mt-3 text-xs uppercase tracking-[0.3em] text-slate-500">JPG • PNG • WEBP • up to 20 MB</span>
@@ -318,7 +326,7 @@ export default function PhotoEnhancer() {
         <div className="space-y-7">
           <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">Smart Auto Enhance</h2>
+              <h2 className="text-2xl font-bold text-slate-900">AI Photo Enhancer</h2>
               <p className="mt-1 text-sm text-slate-500">
                 Compare the original and enhanced version, fine-tune the result, and download a polished file in your browser.
               </p>
@@ -382,10 +390,20 @@ export default function PhotoEnhancer() {
                   <h3 className="font-bold text-slate-900">Controls</h3>
                   <p className="text-sm text-slate-500">Fine-tune in real time, then download safely.</p>
                 </div>
-                <button type="button" onClick={applyAutoEnhance} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700" disabled={isBusy || isProcessing}>
-                  Smart Auto Enhance
+                <button type="button" onClick={() => void applyAutoEnhance()} className="rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 px-3 py-2 text-sm font-semibold text-white transition hover:from-blue-700 hover:to-violet-700 disabled:opacity-60" disabled={isBusy || isProcessing || isAnalyzing}>
+                  {isAnalyzing ? "AI is analyzing…" : "✦ Enhance with AI"}
                 </button>
               </div>
+
+              {aiAnalysis && (
+                <div className="rounded-2xl border border-violet-200 bg-violet-50 p-3 text-sm text-violet-950">
+                  <div className="font-semibold">AI analysis complete</div>
+                  <p className="mt-1 text-xs leading-5 text-violet-800">{aiAnalysis.summary}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {aiAnalysis.corrections.map((correction) => <span key={correction} className="rounded-full bg-white px-2 py-1 text-[11px] font-medium text-violet-700 ring-1 ring-violet-200">{correction}</span>)}
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-wrap gap-2">
                 {presetOptions.map((option) => (
@@ -399,6 +417,8 @@ export default function PhotoEnhancer() {
                 <AdjustmentControl label="Brightness" value={settings.brightness} min={70} max={130} step={1} onChange={(value) => updateSetting("brightness", value)} />
                 <AdjustmentControl label="Contrast" value={settings.contrast} min={80} max={130} step={1} onChange={(value) => updateSetting("contrast", value)} />
                 <AdjustmentControl label="Colour" value={settings.saturation} min={80} max={130} step={1} onChange={(value) => updateSetting("saturation", value)} />
+                <AdjustmentControl label="Temperature" value={settings.temperature} min={-20} max={20} step={1} onChange={(value) => updateSetting("temperature", value)} />
+                <AdjustmentControl label="Tint" value={settings.tint} min={-20} max={20} step={1} onChange={(value) => updateSetting("tint", value)} />
                 <AdjustmentControl label="Sharpness" value={settings.sharpness} min={0} max={20} step={1} onChange={(value) => updateSetting("sharpness", value)} />
                 <AdjustmentControl label="Clarity" value={settings.clarity} min={0} max={20} step={1} onChange={(value) => updateSetting("clarity", value)} />
                 <AdjustmentControl label="Highlights" value={settings.highlights} min={-20} max={20} step={1} onChange={(value) => updateSetting("highlights", value)} />
