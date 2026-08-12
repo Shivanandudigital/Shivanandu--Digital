@@ -351,7 +351,7 @@ export default function PhotoEnhancer() {
                   </div>
                 </div>
 
-                <div className="relative flex min-h-[26rem] items-center justify-center overflow-hidden p-3 sm:p-4">
+                <div className="relative flex min-h-[20rem] items-center justify-center overflow-hidden p-3 sm:min-h-[26rem] sm:p-4">
                   <img
                     src={loadedImage.objectUrl}
                     alt="Original photograph"
@@ -377,7 +377,7 @@ export default function PhotoEnhancer() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 <InfoCard label="Original size" value={`${loadedImage.width} × ${loadedImage.height}`} />
                 <InfoCard label="Output size" value={derivedOutputSize ? `${derivedOutputSize.width} × ${derivedOutputSize.height}` : `${loadedImage.width} × ${loadedImage.height}`} />
                 <InfoCard label="Estimated size" value={derivedOutputSize?.estimated || "—"} />
@@ -413,18 +413,27 @@ export default function PhotoEnhancer() {
                 ))}
               </div>
 
-              <div className="space-y-4">
-                <AdjustmentControl label="Brightness" value={settings.brightness} min={70} max={130} step={1} onChange={(value) => updateSetting("brightness", value)} />
-                <AdjustmentControl label="Contrast" value={settings.contrast} min={80} max={130} step={1} onChange={(value) => updateSetting("contrast", value)} />
-                <AdjustmentControl label="Colour" value={settings.saturation} min={80} max={130} step={1} onChange={(value) => updateSetting("saturation", value)} />
-                <AdjustmentControl label="Temperature" value={settings.temperature} min={-20} max={20} step={1} onChange={(value) => updateSetting("temperature", value)} />
-                <AdjustmentControl label="Tint" value={settings.tint} min={-20} max={20} step={1} onChange={(value) => updateSetting("tint", value)} />
-                <AdjustmentControl label="Sharpness" value={settings.sharpness} min={0} max={20} step={1} onChange={(value) => updateSetting("sharpness", value)} />
-                <AdjustmentControl label="Clarity" value={settings.clarity} min={0} max={20} step={1} onChange={(value) => updateSetting("clarity", value)} />
-                <AdjustmentControl label="Highlights" value={settings.highlights} min={-20} max={20} step={1} onChange={(value) => updateSetting("highlights", value)} />
-                <AdjustmentControl label="Shadows" value={settings.shadows} min={-20} max={20} step={1} onChange={(value) => updateSetting("shadows", value)} />
-                <AdjustmentControl label="Noise Reduction" value={settings.noiseReduction} min={0} max={20} step={1} onChange={(value) => updateSetting("noiseReduction", value)} />
-              </div>
+              <details className="group rounded-2xl border border-slate-200 bg-white">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800">
+                  <span>
+                    Manual adjustments
+                    <span className="ml-2 text-xs font-normal text-slate-500">Optional</span>
+                  </span>
+                  <span className="text-lg text-slate-400 transition group-open:rotate-180">⌄</span>
+                </summary>
+                <div className="space-y-4 border-t border-slate-100 px-4 py-4">
+                  <AdjustmentControl label="Brightness" value={settings.brightness} min={70} max={130} step={1} onChange={(value) => updateSetting("brightness", value)} />
+                  <AdjustmentControl label="Contrast" value={settings.contrast} min={80} max={130} step={1} onChange={(value) => updateSetting("contrast", value)} />
+                  <AdjustmentControl label="Colour" value={settings.saturation} min={80} max={130} step={1} onChange={(value) => updateSetting("saturation", value)} />
+                  <AdjustmentControl label="Temperature" value={settings.temperature} min={-20} max={20} step={1} onChange={(value) => updateSetting("temperature", value)} />
+                  <AdjustmentControl label="Tint" value={settings.tint} min={-20} max={20} step={1} onChange={(value) => updateSetting("tint", value)} />
+                  <AdjustmentControl label="Sharpness" value={settings.sharpness} min={0} max={20} step={1} onChange={(value) => updateSetting("sharpness", value)} />
+                  <AdjustmentControl label="Clarity" value={settings.clarity} min={0} max={20} step={1} onChange={(value) => updateSetting("clarity", value)} />
+                  <AdjustmentControl label="Highlights" value={settings.highlights} min={-20} max={20} step={1} onChange={(value) => updateSetting("highlights", value)} />
+                  <AdjustmentControl label="Shadows" value={settings.shadows} min={-20} max={20} step={1} onChange={(value) => updateSetting("shadows", value)} />
+                  <AdjustmentControl label="Noise Reduction" value={settings.noiseReduction} min={0} max={20} step={1} onChange={(value) => updateSetting("noiseReduction", value)} />
+                </div>
+              </details>
 
               <div className="grid gap-3 border-t border-slate-200 pt-4 sm:grid-cols-2">
                 <button type="button" onClick={undoLastChange} className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400" disabled={history.length === 0}>
@@ -435,7 +444,12 @@ export default function PhotoEnhancer() {
                 </button>
               </div>
 
-              <div className="space-y-3 border-t border-slate-200 pt-4">
+              <details className="group rounded-2xl border border-slate-200 bg-white">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-slate-800">
+                  <span>Download settings</span>
+                  <span className="text-xs font-normal text-slate-500">{outputFormat.toUpperCase()} · {outputScale === "original" ? "Original" : outputScale}</span>
+                </summary>
+                <div className="space-y-3 border-t border-slate-100 px-4 py-4">
                 <div>
                   <label className="text-sm font-semibold text-slate-700" htmlFor="output-scale">Output scale</label>
                   <select id="output-scale" value={outputScale} onChange={(event) => setOutputScale(event.target.value as OutputScale)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700">
@@ -461,7 +475,8 @@ export default function PhotoEnhancer() {
                     <div className="mt-1 text-xs text-slate-500">{jpegQuality}% quality</div>
                   </div>
                 )}
-              </div>
+                </div>
+              </details>
 
               <button type="button" onClick={downloadEnhancedPhoto} className="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700" disabled={isBusy || isProcessing || isDownloading}>
                 {isDownloading ? "Preparing download…" : `Download ${outputFormat === "jpeg" ? "JPG" : "PNG"}`}
@@ -491,9 +506,9 @@ function AdjustmentControl({ label, value, min, max, step, onChange }: { label: 
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-3 text-sm text-slate-600">
-      <div className="text-xs uppercase tracking-[0.25em] text-slate-400">{label}</div>
-      <div className="mt-1 font-semibold text-slate-800">{value}</div>
+    <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-2.5 text-slate-600 sm:p-3">
+      <div className="truncate text-[9px] uppercase tracking-[0.12em] text-slate-400 sm:text-xs sm:tracking-[0.2em]">{label}</div>
+      <div className="mt-1 truncate text-xs font-semibold text-slate-800 sm:text-sm">{value}</div>
     </div>
   );
 }
