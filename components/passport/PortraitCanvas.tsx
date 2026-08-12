@@ -34,17 +34,37 @@ export default function PortraitCanvas({
     const canvas = canvasRef.current;
     if (!canvas || !sourceImage || !cropArea) return;
 
+    const source =
+      typeof sourceImage === "string"
+        ? sourceImage
+        : sourceImage.src;
+
     void renderFinalPassportCanvas({
-      canvas,
-      sourceImage,
-      cropArea,
+      imageSrc: source,
+      crop: cropArea,
       rotation,
-      size,
-      backgroundColor,
-      transparentBackground,
-      adjustments,
-    }).catch((error) => console.error("Passport preview rendering failed:", error));
-  }, [adjustments, backgroundColor, cropArea, rotation, size, sourceImage, transparentBackground]);
+      backgroundColor: transparentBackground
+        ? "transparent"
+        : backgroundColor,
+      targetWidth: width,
+      targetHeight: height,
+    })
+      .then((renderedUrl) => {
+        const renderedImage = new Image();
+        renderedImage.onload = () => {
+          const context = canvas.getContext("2d");
+          if (!context) return;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.width = width;
+          canvas.height = height;
+          context.drawImage(renderedImage, 0, 0, width, height);
+        };
+        renderedImage.src = renderedUrl;
+      })
+      .catch((error) =>
+        console.error("Passport preview rendering failed:", error)
+      );
+  }, [adjustments, backgroundColor, cropArea, height, rotation, size, sourceImage, transparentBackground, width]);
 
   return (
     <canvas

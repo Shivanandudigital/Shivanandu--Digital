@@ -47,7 +47,7 @@ export default function PassportPhotoMaker() {
   const [
     processingMessage,
     setProcessingMessage,
-  ] = useState("Preparing AI model...");
+  ] = useState("Connecting to PhotoRoom AI...");
 
   const [
     backgroundError,
@@ -58,7 +58,7 @@ export default function PassportPhotoMaker() {
     setImage(null);
     setBackgroundError(null);
     setProcessingProgress(0);
-    setProcessingMessage("Preparing AI model...");
+    setProcessingMessage("Connecting to PhotoRoom AI...");
     setIsRemovingBackground(true);
 
     try {
@@ -70,11 +70,11 @@ export default function PassportPhotoMaker() {
 
             if (progress < 20) {
               setProcessingMessage(
-                "Loading background removal model..."
+                "Uploading photo securely..."
               );
             } else if (progress < 60) {
               setProcessingMessage(
-                "Detecting the person..."
+                "PhotoRoom AI is detecting the person..."
               );
             } else if (progress < 95) {
               setProcessingMessage(
@@ -106,7 +106,9 @@ export default function PassportPhotoMaker() {
         setImage(originalImage);
 
         setBackgroundError(
-          "Background automatically remove করা যায়নি। Original photo ব্যবহার করা হয়েছে।"
+          error instanceof Error
+            ? `${error.message} Original photo ব্যবহার করা হয়েছে।`
+            : "Background automatically remove করা যায়নি। Original photo ব্যবহার করা হয়েছে।"
         );
       } catch (fileError) {
         console.error(
@@ -127,7 +129,7 @@ export default function PassportPhotoMaker() {
     setImage(null);
     setProcessingProgress(0);
     setProcessingMessage(
-      "Preparing AI model..."
+      "Connecting to PhotoRoom AI..."
     );
     setBackgroundError(null);
     setIsRemovingBackground(false);
@@ -171,8 +173,7 @@ export default function PassportPhotoMaker() {
           </p>
 
           <p className="mt-5 max-w-md text-xs leading-5 text-gray-500">
-            প্রথমবার AI model download হওয়ার কারণে
-            processing-এ কিছুটা বেশি সময় লাগতে পারে।
+            PhotoRoom AI নিরাপদে ছবিটির background remove করছে।
           </p>
         </div>
       ) : null}

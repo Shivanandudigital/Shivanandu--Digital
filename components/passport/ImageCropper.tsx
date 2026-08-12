@@ -2,8 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import CropCanvas from "./CropCanvas";
-import { renderFinalPassportCanvas } from "@/lib/composePassport";
+import {
+  renderFinalPassportCanvas,
+  renderFinalPassportPng,
+  type ComposePassportOptions,
+} from "@/lib/composePassport";
 import { detectAutomaticPassportCrop } from "@/lib/autoPassportCrop";
+import { downloadFile } from "@/lib/downloadImage";
+import { downloadPdf } from "@/lib/downloadPdf";
 
 interface ImageCropperProps {
   image: string;
@@ -52,6 +58,22 @@ export default function ImageCropper({
     setCroppedAreaPixels(croppedPixels);
   }, []);
 
+  // Single source of truth for the composed photo: the Automatic Passport
+  // Frame preview, Final Preview, and every download format all build
+  // from this same set of options, so none of them can drift out of sync
+  // with each other or with what the person actually cropped/zoomed to.
+  const buildComposeOptions = useCallback((): ComposePassportOptions => {
+    return {
+      imageSrc: image,
+      crop: croppedAreaPixels || { x: 0, y: 0, width: 413, height: 531 },
+      zoom,
+      rotation,
+      backgroundColor: bgColor,
+      targetWidth: 413,
+      targetHeight: 531,
+    };
+  }, [image, croppedAreaPixels, zoom, rotation, bgColor]);
+
   // ফাইনাল ক্যানভাস রেন্ডার
   useEffect(() => {
     let isMounted = true;
@@ -60,15 +82,7 @@ export default function ImageCropper({
       if (!image) return;
 
       try {
-        const finalUrl = await renderFinalPassportCanvas({
-          imageSrc: image,
-          crop: croppedAreaPixels || { x: 0, y: 0, width: 413, height: 531 },
-          zoom,
-          rotation,
-          backgroundColor: bgColor,
-          targetWidth: 413,
-          targetHeight: 531,
-        });
+        const finalUrl = await renderFinalPassportCanvas(buildComposeOptions());
 
         if (isMounted) {
           setPreviewImage(finalUrl);
@@ -83,14 +97,40 @@ export default function ImageCropper({
     return () => {
       isMounted = false;
     };
-  }, [image, croppedAreaPixels, zoom, rotation, bgColor]);
+  }, [buildComposeOptions, image]);
 
-  const handleDownload = (format: string) => {
-    if (!previewImage) return;
-    const link = document.createElement("a");
-    link.href = previewImage;
-    link.download = `passport-photo.${format}`;
-    link.click();
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async (format: "jpg" | "png" | "pdf") => {
+    if (!image) return;
+
+    setIsDownloading(true);
+
+    try {
+      const options = buildComposeOptions();
+
+      if (format === "jpg") {
+        const jpegUrl = await renderFinalPassportCanvas(options);
+        downloadFile(jpegUrl, "passport-photo.jpg");
+        return;
+      }
+
+      // PNG and PDF both use the lossless PNG render of the exact same
+      // composition, so neither loses quality to an unnecessary second
+      // JPEG re-encode, and both stay pixel-identical to Final Preview.
+      const pngUrl = await renderFinalPassportPng(options);
+
+      if (format === "png") {
+        downloadFile(pngUrl, "passport-photo.png");
+        return;
+      }
+
+      downloadPdf(pngUrl, "passport-photo.pdf");
+    } catch (err) {
+      console.error("Download generation failed:", err);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -288,21 +328,24 @@ export default function ImageCropper({
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <button
             onClick={() => handleDownload("jpg")}
-            className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-blue-700"
+            disabled={isDownloading}
+            className="rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Download JPG
+            {isDownloading ? "Preparing..." : "Download JPG"}
           </button>
           <button
             onClick={() => handleDownload("png")}
-            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-indigo-700"
+            disabled={isDownloading}
+            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Download PNG
+            {isDownloading ? "Preparing..." : "Download PNG"}
           </button>
           <button
             onClick={() => handleDownload("pdf")}
-            className="rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-red-700"
+            disabled={isDownloading}
+            className="rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white shadow hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Download PDF
+            {isDownloading ? "Preparing..." : "Download PDF"}
           </button>
           <button
             onClick={() => window.print()}

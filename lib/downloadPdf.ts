@@ -1,5 +1,19 @@
 import { jsPDF } from "jspdf";
 
+/**
+ * Reads the MIME type out of a `data:` URL to determine the correct
+ * format string for jsPDF's `addImage`. This used to be hardcoded to
+ * "JPEG" regardless of what was actually passed in - feeding it a PNG
+ * data URL (as the passport photo pipeline now produces for lossless
+ * downloads) produced a broken/garbled embedded image. Detecting the
+ * real format keeps the PDF pixel-identical to the Final Preview.
+ */
+function detectImageFormat(imageData: string): "PNG" | "JPEG" | "WEBP" {
+  if (imageData.startsWith("data:image/png")) return "PNG";
+  if (imageData.startsWith("data:image/webp")) return "WEBP";
+  return "JPEG";
+}
+
 export function downloadPdf(
   imageData: string,
   fileName: string = "passport-photo.pdf"
@@ -21,7 +35,7 @@ export function downloadPdf(
 
   pdf.addImage(
     imageData,
-    "JPEG",
+    detectImageFormat(imageData),
     x,
     y,
     photoWidth,

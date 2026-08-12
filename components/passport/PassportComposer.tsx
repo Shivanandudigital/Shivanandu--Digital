@@ -66,15 +66,13 @@ export default function PassportComposer({
           sourceImage.onerror = () => reject(new Error("Passport source image could not be loaded."));
         });
 
-        const composedImage = await composePassportPhoto(
-          sourceImage,
-          size,
+        const isSquare = size.toLowerCase().includes("2x2");
+        const composedImage = await composePassportPhoto({
+          imageSrc: sourceImage.src,
           backgroundColor,
-          headSize,
-          faceDetected,
-          composition,
-          face
-        );
+          targetWidth: isSquare ? 600 : 413,
+          targetHeight: isSquare ? 600 : 531,
+        });
 
         if (!cancelled) {
           setOutput(composedImage);

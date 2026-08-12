@@ -18,7 +18,22 @@ export interface ComposePassportOptions {
   targetHeight?: number;
 }
 
-export async function renderFinalPassportCanvas(options: ComposePassportOptions): Promise<string> {
+/**
+ * Builds the composited passport-photo canvas: background fill, then the
+ * cropped/zoomed/rotated foreground drawn on top via the browser's
+ * standard alpha-over compositing. This is the single source of truth for
+ * every rendering surface (Automatic Passport Frame preview, Final
+ * Preview, JPG, PNG, PDF and Print Sheet) - each of them calls this same
+ * function so none of them can drift out of sync with each other.
+ *
+ * Because the foreground image's alpha and RGB have already been
+ * decontaminated (see lib/background/removeBackground.ts), a plain
+ * source-over composite here is correct: no additional edge processing
+ * is needed or should be added at this stage.
+ */
+export async function buildComposedPassportCanvas(
+  options: ComposePassportOptions
+): Promise<HTMLCanvasElement> {
   const {
     imageSrc,
     zoom = 1,
@@ -48,7 +63,7 @@ export async function renderFinalPassportCanvas(options: ComposePassportOptions)
         return;
       }
 
-      // ১. ব্যাকগ্রাউন্ড কালার দেওয়া
+      // ১. ব্যাকগ্রাউন্ড কালার দেওয়া
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, targetWidth, targetHeight);
 
@@ -59,7 +74,7 @@ export async function renderFinalPassportCanvas(options: ComposePassportOptions)
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(zoom, zoom);
 
-      // ৩. ছবি কোনো বিকৃতি ছাড়াই অনুপাত অনুযায়ী ক্যানভাসে ড্র করা
+      // ৩. ছবি কোনো বিকৃতি ছাড়াই অনুপাত অনুযায়ী ক্যানভাসে ড্র করা
       ctx.drawImage(
         img,
         cropX,
@@ -74,7 +89,7 @@ export async function renderFinalPassportCanvas(options: ComposePassportOptions)
 
       ctx.restore();
 
-      resolve(canvas.toDataURL("image/jpeg", 0.95));
+      resolve(canvas);
     };
 
     img.onerror = () => {
@@ -85,5 +100,32 @@ export async function renderFinalPassportCanvas(options: ComposePassportOptions)
   });
 }
 
-// ব্যাকওয়ার্ড ও অল্টারনেটিভ ইমপোর্টের জন্য
+/**
+ * JPEG preview/download data URL. Used for the on-screen Final Preview
+ * (where a 0.95-quality JPEG is visually indistinguishable from the
+ * source and cheaper to keep in memory/state) and for the "Download JPG"
+ * button.
+ */
+export async function renderFinalPassportCanvas(
+  options: ComposePassportOptions,
+  quality = 0.95
+): Promise<string> {
+  const canvas = await buildComposedPassportCanvas(options);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
+/**
+ * Lossless PNG data URL, built from the exact same composition as the
+ * preview/JPEG above. Used for the "Download PNG" button and as the
+ * source image embedded into the PDF, so neither loses quality to a
+ * second, unnecessary JPEG re-encode.
+ */
+export async function renderFinalPassportPng(
+  options: ComposePassportOptions
+): Promise<string> {
+  const canvas = await buildComposedPassportCanvas(options);
+  return canvas.toDataURL("image/png");
+}
+
+// ব্যাকওয়ার্ড ও অল্টারনেটিভ ইমপোর্টের জন্য
 export const composePassportPhoto = renderFinalPassportCanvas;
