@@ -29,84 +29,73 @@ html {
   scroll-behavior: smooth;
 }
 
-.independence-watermark {
+.independence-page-flag {
   position: fixed;
-  inset: 5.5rem 0 auto;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-  justify-content: center;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
   pointer-events: none;
-  filter: drop-shadow(0 8px 18px rgb(15 23 42 / 0.18));
+  opacity: 0.075;
+  overflow: hidden;
 }
 
-.independence-watermark__wish {
+.independence-page-flag__band {
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.independence-page-flag__band--saffron { background: #ff9933; }
+.independence-page-flag__band--white { background: #ffffff; }
+.independence-page-flag__band--green { background: #138808; }
+
+.independence-page-flag__chakra {
+  color: #000080;
+  font-size: clamp(11rem, 34vw, 30rem);
+  line-height: 1;
+  opacity: 0.72;
+  animation: independence-chakra-spin 22s linear infinite;
+}
+
+.independence-wish {
+  position: fixed;
+  inset: 5.3rem 1.25rem auto auto;
+  z-index: 50;
+  display: flex;
+  max-width: min(23rem, calc(100vw - 2rem));
   flex-direction: column;
   align-items: center;
-  color: #ffffff;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 1rem;
+  background: rgb(15 23 42 / 0.34);
+  backdrop-filter: blur(5px);
+  pointer-events: none;
   text-align: center;
-  text-shadow:
-    0 0 7px #ff9933,
-    0 0 14px #ff9933,
-    0 2px 4px rgb(0 0 0 / 0.75);
-  animation: independence-wish-flash 1.8s ease-in-out infinite;
+  box-shadow: 0 8px 25px rgb(0 0 0 / 0.2);
+  animation: independence-wish-flash 1.7s ease-in-out infinite;
 }
 
-.independence-watermark__wish span {
-  font-size: clamp(1.05rem, 2.6vw, 1.8rem);
+.independence-wish__english {
+  color: #ffb15c;
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.025em;
 }
 
-.independence-watermark__wish strong {
-  margin-top: 0.15rem;
+.independence-wish__bengali {
+  margin-top: 0.12rem;
   color: #ffffff;
-  font-size: clamp(0.78rem, 1.8vw, 1.15rem);
+  font-size: clamp(0.72rem, 1.3vw, 0.92rem);
   font-weight: 800;
 }
 
-.independence-watermark__flag {
-  width: min(46vw, 520px);
-  min-width: 260px;
-  overflow: hidden;
-  border-radius: 0.7rem;
-  transform-origin: top center;
-  opacity: 0.14;
-  animation: independence-flag-float 5s ease-in-out infinite;
-}
-
-.independence-watermark__stripe {
-  display: flex;
-  height: clamp(1.5rem, 3.4vw, 2.8rem);
-  align-items: center;
-  justify-content: center;
-}
-
-.independence-watermark__stripe--saffron {
-  background: #ff9933;
-}
-
-.independence-watermark__stripe--white {
-  background: #ffffff;
-}
-
-.independence-watermark__stripe--green {
-  background: #138808;
-}
-
-.independence-watermark__chakra {
-  color: #000080;
-  font-size: clamp(1.8rem, 4vw, 3.25rem);
-  line-height: 1;
-  animation: independence-chakra-spin 18s linear infinite;
-}
-
-@keyframes independence-flag-float {
-  0%, 100% { transform: translate3d(-2vw, 0, 0) rotate(-1deg); }
-  50% { transform: translate3d(2vw, 0.8rem, 0) rotate(1deg); }
+.independence-wish__jai-hind {
+  margin-top: 0.08rem;
+  color: #68e05d;
+  font-size: clamp(0.78rem, 1.4vw, 1rem);
+  font-weight: 900;
 }
 
 @keyframes independence-chakra-spin {
@@ -115,37 +104,29 @@ html {
 
 @keyframes independence-wish-flash {
   0%, 100% {
-    opacity: 0.45;
-    transform: scale(0.98);
+    opacity: 0.62;
+    transform: scale(0.97);
+    filter: drop-shadow(0 0 5px #ff9933);
   }
   50% {
     opacity: 1;
     transform: scale(1.03);
-    text-shadow:
-      0 0 9px #ff9933,
-      0 0 18px #ffffff,
-      0 0 26px #138808,
-      0 2px 4px rgb(0 0 0 / 0.8);
+    filter: drop-shadow(0 0 9px #ff9933) drop-shadow(0 0 13px #138808);
   }
 }
 
 @media (max-width: 640px) {
-  .independence-watermark {
-    inset-block-start: 4.75rem;
-    gap: 0.45rem;
-  }
+  .independence-page-flag { opacity: 0.065; }
 
-  .independence-watermark__flag {
-    width: 72vw;
-    min-width: 0;
-    opacity: 0.12;
+  .independence-wish {
+    inset: 4.35rem 0.6rem auto auto;
+    max-width: calc(100vw - 1.2rem);
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.75rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .independence-watermark__flag,
-  .independence-watermark__chakra,
-  .independence-watermark__wish {
-    animation: none;
-  }
+  .independence-page-flag__chakra,
+  .independence-wish { animation: none; }
 }
