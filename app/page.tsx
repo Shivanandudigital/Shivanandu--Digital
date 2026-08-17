@@ -7,12 +7,10 @@ import Services from "../components/Services";
 import ContactForm from "../components/ContactForm";
 import Testimonials from "../components/Testimonials";
 import CustomerReviewsSection from "../components/CustomerReviewsSection";
-import IndependenceDayWatermark from "../components/IndependenceDayWatermark";
 
 export default function Home() {
   return (
     <>
-      <IndependenceDayWatermark />
       <Navbar />
 <Hero />
       <main className="min-h-screen bg-white text-gray-900">
