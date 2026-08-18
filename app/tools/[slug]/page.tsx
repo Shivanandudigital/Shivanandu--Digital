@@ -8,6 +8,7 @@ import CompressPdf from "@/components/compress-pdf/CompressPdf";
 import CompressJpg from "@/components/compress-jpg/CompressJpg";
 import ImageResizer from "@/components/image-resizer/ImageResizer";
 import CropImageTool from "@/components/crop-image/CropImageTool";
+import DocumentPrintingOrder from "@/components/document-printing/DocumentPrintingOrder";
 
 type Props = {
   params: Promise<{
@@ -137,6 +138,19 @@ const toolMetadata: Record<string, ToolMetadata> = {
     ],
   },
   "crop-image": { title: "Crop Image", seoTitle: "Crop Image Online Free", description: "Crop, rotate and flip images online.", keywords: ["crop image", "crop photo online"] },
+  "document-printing-order": {
+    title: "Secure Document Printing",
+    seoTitle: "Document Printing Order Online",
+    description:
+      "Order secure printing for Ration Card, Voter e-EPIC, Ayushman Bharat Card and Driving Licence from Shivanandu Digital.",
+    keywords: [
+      "document printing online",
+      "ration card print",
+      "voter card print",
+      "Ayushman card print",
+      "driving licence print",
+    ],
+  },
 };
 
 function formatToolTitle(slug: string) {
@@ -270,6 +284,8 @@ export default async function ToolPage({ params }: Props) {
           <ImageResizer />
         ) : slug === "crop-image" ? (
           <CropImageTool />
+        ) : slug === "document-printing-order" ? (
+          <DocumentPrintingOrder />
         ) : (
           <div className="rounded-3xl bg-white p-16 text-center shadow-lg">
             <h2 className="mb-3 text-3xl font-bold">

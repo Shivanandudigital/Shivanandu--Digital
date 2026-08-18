@@ -112,4 +112,14 @@ export const tools: DigitalTool[] = [
       "Get professional assistance with passport applications.",
     status: "coming-soon",
   },
+  {
+    id: 12,
+    name: "Document Printing Order",
+    slug: "document-printing-order",
+    category: "Online Services",
+    icon: "🪪",
+    description:
+      "Order secure printing for Ration Card, Voter e-EPIC, Ayushman Bharat Card and Driving Licence.",
+    status: "ready",
+  },
 ];
