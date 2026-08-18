@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { calculatePvcTotal } from "@/lib/pvcPricing";
 
 export const runtime = "nodejs";
 const documentTypes = new Set(["ration_card", "voter_epic", "ayushman_card", "driving_licence"]);
@@ -22,6 +23,23 @@ function validFile(bytes: Uint8Array, mime: string) {
   if (mime === "application/pdf") return bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
   if (mime === "image/jpeg") return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   return mime === "image/png" && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+}
+
+async function createRazorpayOrder(amountInRupees: number, receipt: string) {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !keySecret) throw new Error("Razorpay is not configured");
+  const response = await fetch("https://api.razorpay.com/v1/orders", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ amount: amountInRupees * 100, currency: "INR", receipt, notes: { service: "PVC Card Printing" } }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Payment order creation failed");
+  return response.json() as Promise<{ id: string; amount: number; currency: string }>;
 }
 
 export async function POST(request: NextRequest) {
@@ -60,6 +78,9 @@ export async function POST(request: NextRequest) {
     }
     if (totalSize > 4 * 1024 * 1024) return NextResponse.json({ error: "All files together must be 4 MB or less." }, { status: 400 });
 
+    const cardQuantity = items.reduce((sum, item) => sum + item.copies, 0);
+    const pricing = calculatePvcTotal(cardQuantity, deliveryMethod, pincode);
+
     orderId = `SDP-${randomBytes(4).toString("hex").toUpperCase()}`;
     const rows = [];
     for (let index = 0; index < items.length; index += 1) {
@@ -73,11 +94,12 @@ export async function POST(request: NextRequest) {
     }
 
     const first = rows[0];
-    const orderInsert = await supabase.from("document_print_orders").insert({ order_id: orderId, document_type: first.document_type, print_type: first.print_type, copies: first.copies, customer_name: customerName, phone, delivery_method: deliveryMethod, delivery_address: deliveryMethod === "home_delivery" ? address : null, pincode: deliveryMethod === "home_delivery" ? pincode : null, storage_path: first.storage_path, original_file_name: first.original_file_name, file_mime_type: first.file_mime_type, status: "Order Received", consented_at: new Date().toISOString() });
+    const razorpayOrder = await createRazorpayOrder(pricing.total, orderId);
+    const orderInsert = await supabase.from("document_print_orders").insert({ order_id: orderId, document_type: first.document_type, print_type: first.print_type, copies: first.copies, customer_name: customerName, phone, delivery_method: deliveryMethod, delivery_address: deliveryMethod === "home_delivery" ? address : null, pincode: deliveryMethod === "home_delivery" ? pincode : null, storage_path: first.storage_path, original_file_name: first.original_file_name, file_mime_type: first.file_mime_type, status: "Order Received", consented_at: new Date().toISOString(), card_quantity: pricing.quantity, unit_price: pricing.unitPrice, card_subtotal: pricing.subtotal, delivery_charge: pricing.deliveryCharge, total_amount: pricing.total, payment_status: "Pending", razorpay_order_id: razorpayOrder.id });
     if (orderInsert.error) throw orderInsert.error;
     const itemInsert = await supabase.from("document_print_order_items").insert(rows);
     if (itemInsert.error) throw itemInsert.error;
-    return NextResponse.json({ orderId, documentCount: rows.length }, { status: 201 });
+    return NextResponse.json({ orderId, documentCount: rows.length, pricing, razorpayOrderId: razorpayOrder.id, razorpayKeyId: process.env.RAZORPAY_KEY_ID }, { status: 201 });
   } catch (error) {
     console.error("Document order error", error);
     if (orderId) await supabase.from("document_print_orders").delete().eq("order_id", orderId);
@@ -92,8 +114,8 @@ export async function GET(request: NextRequest) {
   const orderId = (request.nextUrl.searchParams.get("orderId") || "").trim().toUpperCase();
   const phone = (request.nextUrl.searchParams.get("phone") || "").trim();
   if (!/^SDP-[A-F0-9]{8}$/.test(orderId) || !/^[6-9]\d{9}$/.test(phone)) return NextResponse.json({ error: "Enter a valid Order ID and mobile number." }, { status: 400 });
-  const order = await supabase.from("document_print_orders").select("order_id,status").eq("order_id", orderId).eq("phone", phone).maybeSingle();
+  const order = await supabase.from("document_print_orders").select("order_id,status,payment_status,total_amount").eq("order_id", orderId).eq("phone", phone).maybeSingle();
   if (!order.data) return NextResponse.json({ error: "No matching order was found." }, { status: 404 });
   const items = await supabase.from("document_print_order_items").select("id", { count: "exact", head: true }).eq("order_id", orderId);
-  return NextResponse.json({ orderId: order.data.order_id, status: order.data.status, documentCount: items.count || 1 });
+  return NextResponse.json({ orderId: order.data.order_id, status: order.data.status, paymentStatus: order.data.payment_status, totalAmount: order.data.total_amount, documentCount: items.count || 1 });
 }

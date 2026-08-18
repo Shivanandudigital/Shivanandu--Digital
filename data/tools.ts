@@ -114,12 +114,12 @@ export const tools: DigitalTool[] = [
   },
   {
     id: 12,
-    name: "Document Printing Order",
+    name: "PVC Card Printing Service",
     slug: "document-printing-order",
     category: "Online Services",
     icon: "🪪",
     description:
-      "Order secure printing for Ration Card, Voter e-EPIC, Ayushman Bharat Card and Driving Licence.",
+      "Order PVC card printing with automatic pricing, Speed Post delivery and secure online payment.",
     status: "ready",
   },
 ];
